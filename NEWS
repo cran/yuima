@@ -1,0 +1,19 @@
+2012/10/05: add mpv.R, bns.test.R, mpv.Rd, bns.test.Rd
+2012/12/13: add noisy.sampling.R, noisy.sampling.Rd
+            modify bns.test.R, cce.R, llag.R, mpv.R, bns.test.Rd, cce.Rd, llag.Rd, mpv.Rd
+2012/12/19: modify cce.R
+2012/12/19: modify cce.R, noisy.sampling.R
+2012/12/22: modify cce.R
+2013/02/06: modify rng.R
+2013/02/11: modify cce.R
+2013/04/13: modify asymptotic_term_second.R, asymptotic_term_third.R, asymptotic_term_third_function.R, cce.R, llag.R
+2013/04/13: modify qmle.R
+2013/04/14: modify qmle.R
+2013/04/14: modify adaBayes.R
+2013/04/14: modify bns.test.Rd, mpv.Rd
+2013/10/28: add cce_functions.c
+            modify cce.R, llag.R, sim.euler.R, bns.test.Rd, cce.Rd, llag.Rd, mpv.Rd, noisy.sampling.Rd
+2013/10/28: modify llag.R
+2013/10/30: modify cce.R, cce_functions.c
+2013/11/21: modify llag.R
+2013/11/22: modify cce.R, cce_functions.c

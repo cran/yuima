@@ -1,0 +1,131 @@
+import("methods")
+
+##importFrom("stats", "end", "time", "start")
+importFrom("graphics", "plot")
+importFrom("zoo")
+importFrom(stats, confint)
+importFrom(stats4)
+importFrom(expm)
+
+importFrom(utils, toLatex)
+
+
+
+
+
+
+exportClasses("yuima",
+              "yuima.data",
+              "yuima.sampling",
+              "yuima.characteristic",
+              "yuima.model",
+              "model.parameter",
+	      "yuima.carma",
+	      "carma.info",
+	      "yuima.carma.qmle"
+              )
+
+exportMethods(
+              "dim",
+              "length",
+              ## "start",
+              "plot",
+              ## "time",
+              ## "end",
+              "simulate",
+              "cce",
+              "llag",
+              "poisson.random.sampling",
+              "get.zoo.data",
+              "initialize",
+##              "ql",
+##              "rql",
+##              "ml.ql",
+              "adaBayes",
+              "limiting.gamma",
+			  "getF",
+			  "getf",
+			  "getxinit",
+			  "gete",
+			  "simFunctional",
+			  "F0",
+			  "Fnorm",
+			  "asymptotic_term",
+              "cbind.yuima"
+              )
+
+## function which we want to expose to the user
+## all other functions are used internally by the
+## package
+export(setYuima)
+export(setModel) ## builds sde model
+export(setData)
+export(setSampling)
+export(setCharacteristic)
+export(setCarma)
+
+export(dim)
+export(length)
+#export(start)
+export(plot)
+#export(time)
+#export(end)
+
+export(simulate) # simulates couple of processes
+export(subsampling)
+export(cce)
+export(llag)
+export(poisson.random.sampling)
+export(noisy.sampling)
+export(mpv)
+export(bns.test)
+
+export(get.zoo.data)
+
+##export(ql,rql,ml.ql)
+##export(rql)
+export(adaBayes)
+export(rIG, rNIG, rbgamma, rngamma, rstable) ##:: random number generator for Inverse Gaussian
+export(limiting.gamma)
+
+export(setFunctional)
+export(getF)
+export(getf)
+export(getxinit)
+export(gete)
+
+export(simFunctional)
+export(F0)
+export(Fnorm)
+export(asymptotic_term)
+
+##export(LSE)
+export(lse)
+
+export(qmle)
+export(quasilogl)
+export(phi.test)
+export(lasso)
+export(CPoint)
+export(qmleR)
+export(qmleL)
+
+export(CarmaRecovNoise) # Estimates the Levy in carma model 
+
+export(qgv)
+export(mmfrac)
+
+
+
+export(cbind.yuima)
+
+S3method(print, phitest)
+S3method(print, qgv)
+S3method(print, mmfrac)
+
+S3method(toLatex, yuima)
+S3method(toLatex, yuima.model)
+S3method(toLatex, yuima.carma)
+
+useDynLib(yuima)
+
