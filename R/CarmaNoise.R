@@ -144,7 +144,7 @@ aEvalPoly<-function(a,lambdax){
 }
 
 
-CarmaRecovNoise<-function(yuima, param, data=NULL,NoNeg.Noise=FALSE){
+CarmaNoise<-function(yuima, param, data=NULL,NoNeg.Noise=FALSE){
   if( missing(param) ) 
     yuima.stop("Parameter values are missing.")
   
@@ -205,14 +205,14 @@ CarmaRecovNoise<-function(yuima, param, data=NULL,NoNeg.Noise=FALSE){
   tt<-index(ttt)
   y<-coredata(ttt)
   
-  levy<-yuima.CarmaRecovNoise(y,tt,ar.par,ma.par, loc.par, scale.par, lin.par,NoNeg.Noise)
+  levy<-yuima.CarmaNoise(y,tt,ar.par,ma.par, loc.par, scale.par, lin.par,NoNeg.Noise)
   inc.levy<-diff(as.numeric(levy))
   return(inc.levy)
 }
 
 
 
-yuima.CarmaRecovNoise<-function(y,tt,ar.par,ma.par, 
+yuima.CarmaNoise<-function(y,tt,ar.par,ma.par, 
                                 loc.par=NULL, 
                                 scale.par=NULL, 
                                 lin.par=NULL, 

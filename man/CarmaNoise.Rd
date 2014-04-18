@@ -1,17 +1,18 @@
-\name{CarmaRecovNoise}
+\name{CarmaNoise}
 \alias{Recovering.Noise}
 \alias{Carma.Recovering}
 \alias{CarmaRecovNoise}
+\alias{CarmaNoise}
 \alias{Levy.Carma}
 \title{Estimation for the underlying Levy in a carma model}
 \description{Retrieve the increment of the underlying Levy for the carma(p,q) process using the approach developed in Brockwell et al.(2011)}
 \usage{
-CarmaRecovNoise(yuima, param, data=NULL, NoNeg.Noise=FALSE)
+CarmaNoise(yuima, param, data=NULL, NoNeg.Noise=FALSE)
 }
 \arguments{
   \item{yuima}{a yuima object or an object of \code{\link{yuima.carma-class}}.}
   \item{param}{\code{list} of parameters for the carma.}
-  \item{data}{an object of class \code{\link{yuima.data-class}} contains the observations available at uniformly spaced time. If \code{data=NULL}, the default, the 'CarmaRecovNoise' uses the data in an object of \code{\link{yuima.data-class}}.}
+  \item{data}{an object of class \code{\link{yuima.data-class}} contains the observations available at uniformly spaced time. If \code{data=NULL}, the default, the 'CarmaNoise' uses the data in an object of \code{\link{yuima.data-class}}.}
   \item{NoNeg.Noise}{Estimate a non-negative Levy-Driven Carma process. By default \code{NoNeg.Noise=FALSE}.}
 }
 \value{
@@ -21,7 +22,7 @@ CarmaRecovNoise(yuima, param, data=NULL, NoNeg.Noise=FALSE)
 \author{The YUIMA Project Team}
 \note{
   %The function ml.ql uses the function optim internally.
-  The function \code{qmle} uses the function \code{CarmaRecovNoise} for estimation of underlying Levy in the carma model.
+  The function \code{qmle} uses the function \code{CarmaNoise} for estimation of underlying Levy in the carma model.
 }
 
  \references{
@@ -52,10 +53,10 @@ sim0<-simulate(mod0,
                true.parameter=true.parm0,
                sampling=samp0, increment.W=incr.W)
 
-#Applying the CarmaRecovNoise
+#Applying the CarmaNoise
 
 system.time(
-  inc.Levy0<-CarmaRecovNoise(sim0,true.parm0)
+  inc.Levy0<-CarmaNoise(sim0,true.parm0)
 )
 
 # We compare the orginal with the estimated noise increments 
@@ -89,7 +90,7 @@ sim1<-simulate(mod1,
 # We estimate the parameter using qmle.
 carmaopt1 <- qmle(sim1, start=true.parm1)
 summary(carmaopt1)
-# Internally qmle uses CarmaRecovNoise. The result is in 
+# Internally qmle uses CarmaNoise. The result is in 
 plot(carmaopt1)
 
 # Ex.3: Carma(p=2,q=1) with scale and location parameters 
@@ -120,7 +121,7 @@ sim2<-simulate(mod2,
 carmaopt2 <- qmle(sim2, start=true.parm2)
 summary(carmaopt2)
 
-# Increments estimated by CarmaRecovNoise
+# Increments estimated by CarmaNoise
 plot(carmaopt2)
 }
 }
