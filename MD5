@@ -1,5 +1,5 @@
 94d55d512a9ba36caa9b7df079bae19f *COPYING
-a8004a275d4934fc7e0106f5c1b57d9d *DESCRIPTION
+488233956020d352537ee385fe7baf2e *DESCRIPTION
 1b31a8ac48ac8d68cf933385fae31cc9 *NAMESPACE
 9350d490863ce066c694999306acb0c4 *NEWS
 88f93f4a6f4f1891c2efa763a8368caf *R/AllClasses.R
@@ -35,7 +35,7 @@ f506cf2d30a5f912b5221112d7ae8965 *R/subsampling.R
 074dc2d814dee60f80b59ba5014cff4d *R/toLatex.R
 f8b1e52fda98c6f6128ce9ea1551f4bd *R/yuima.R
 edfabacecae0ebb9b40324f1d499b4b9 *R/yuima.characteristic.R
-f7f8cb9df60cdebfb6348ef2bc882b0b *R/yuima.data.R
+519671a9de55db57f8cf57a8e05d7613 *R/yuima.data.R
 56a8471869f97e9fb2e53ce8d5ce3252 *R/yuima.functional.R
 00b08aaaad567e676ada82c567893b06 *R/yuima.model.R
 f75a561a3ff0ff4955bcd329128e1e2e *R/yuima.sampling.R
@@ -64,7 +64,7 @@ b3165cb5569c8200e1951475a788de29 *man/qgv.Rd
 3a21c90c366ccae181e12b2d671541f5 *man/rng.Rd
 462fdc39ca445291aa57448f8fa5b201 *man/setCarma.Rd
 ad4ddfb720691c328760854eda4d505b *man/setCharacteristic.Rd
-32243d3c0a8bd0edb1f9770e83714c75 *man/setData.Rd
+3553554d6bd21880a43ca82082b7c212 *man/setData.Rd
 85e350be0518275991a13c21e6f2723f *man/setFunctional.Rd
 25818ea0309156b49f9ea636b0806c74 *man/setModel.Rd
 0512596ff48ff056083590f1a6b0fe3f *man/setSampling.Rd
