@@ -17,7 +17,7 @@ yuima.warn <- function(x)
 
 yuima.Simplify <- function(expr, yuima.env){
     
-    ###
+    ### 
     
     
     Simplify_ <- function(expr)
@@ -189,6 +189,8 @@ setMethod("initialize", "yuima",
             if(!is.null(data)){
               .Object@data <- data
               eqn <- dim(data)
+              if(is.null(sampling))
+               sampling <- setSampling(grid=list(index(get.zoo.data(data)[[1]])))
             }
             
             if(!is.null(model)){
@@ -243,3 +245,146 @@ setYuima <-
   function(data=NULL, model=NULL, sampling=NULL, characteristic=NULL, functional=NULL){
     return(new("yuima", data=data, model=model, sampling=sampling, characteristic=characteristic,functional=functional))
   }
+
+
+
+
+setMethod("show", "yuima.functional",
+function(object){
+    str(object)
+} )
+
+setMethod("show", "yuima.sampling",
+function(object){
+    str(object)
+} )
+
+
+setMethod("show", "yuima.data",
+function(object){
+    show(setYuima(data=object))
+    
+} )
+
+
+setMethod("show", "yuima.model",
+function(object){
+    show(setYuima(model=object))
+    
+} )
+
+setMethod("show", "yuima",
+function(object){
+    
+    myenv <- new.env()
+    mod <- object@model
+    has.drift <- FALSE
+    has.diff <- FALSE
+    has.fbm <- FALSE
+    has.levy <- FALSE
+    is.wienerdiff <- FALSE
+    is.fracdiff <- FALSE
+    is.jumpdiff <- FALSE
+    is.carma <- FALSE
+
+    if(length(mod@drift)>0) has.drift <- TRUE
+    if(length(mod@diffusion)>0) has.diff <- TRUE
+    if(length(mod@jump.coeff)>0) has.levy <- TRUE
+    if(!is.null(mod@hurst)) has.fbm <- TRUE
+    
+    if( has.drift | has.diff ) is.wienerdiff <- TRUE
+    if( has.fbm  ) is.fracdiff <- TRUE
+    if( has.levy ) is.jumpdiff <- TRUE
+    ldif <- 0
+    if(length(mod@diffusion)>0)
+     ldif <- length(mod@diffusion[[1]])
+    if(ldif==1 & (length(mod@diffusion)==0)){
+     if( as.character(mod@diffusion[[1]]) == "(0)" ){
+      has.diff <- FALSE
+      is.wienerdiff <- FALSE
+      is.fracdiff <- FALSE
+     }
+    }
+    if( class(mod) == "yuima.carma")
+     is.carma <- TRUE
+     
+    if( is.wienerdiff | is.fracdiff | is.jumpdiff  ){
+        if( is.wienerdiff & ! is.carma){
+         cat("\nDiffusion process")
+         if( is.fracdiff ){
+             if(!is.na(mod@hurst)){
+                 if(mod@hurst!=0.5){
+                  cat(sprintf(" with Hurst index:%.2f", mod@hurst))
+                 }
+             } else {
+                 cat(" with unknown Hurst index")
+             }
+         }
+        }
+        if(is.carma)
+          cat(sprintf("\nCarma process p=%d, q=%d", mod@info@p, mod@info@q))
+        
+        if( is.jumpdiff ){
+            if( is.wienerdiff | is.carma ){
+                cat(" with Levy jumps")
+            } else {
+                cat("Levy jump process")
+            }
+        }
+        
+        cat(sprintf("\nNumber of equations: %d", mod@equation.number))
+        if(is.wienerdiff | is.fracdiff)
+         cat(sprintf("\nNumber of Wiener noises: %d", mod@noise.number))
+        if(is.jumpdiff)
+         cat(sprintf("\nNumber of Levy noises: %d", 1))
+         if(length(mod@parameter@all)>0){
+             cat(sprintf("\nParametric model with %d parameters",length(mod@parameter@all)))
+         }
+    }
+    
+    if(length(object@data@original.data)>0){
+        n.series <- 1
+        if(!is.null(dim(object@data@original.data))){
+            n.series <- dim(object@data@original.data)[2]
+            n.length <- dim(object@data@original.data)[1]
+        } else {
+            n.length <- length(object@data@original.data)
+        }
+        
+        cat(sprintf("\n\nNumber of original time series: %d\nlength = %d, time range [%s ; %s]", n.series, n.length, min(time(object@data@original.data)), max(time(object@data@original.data))))
+    }
+    if(length(object@data@zoo.data)>0){
+        n.series <- length(object@data@zoo.data)
+        n.length <- unlist(lapply(object@data@zoo.data, length))
+        t.min <- unlist(lapply(object@data@zoo.data, function(u) as.character(round(time(u)[which.min(time(u))],3))))
+        t.max <- unlist(lapply(object@data@zoo.data, function(u) as.character(round(time(u)[which.max(time(u))],3))))
+        
+        delta <- NULL
+        for(i in 1:n.series){
+            tmp <- length(table(round(diff(time(object@data@zoo.data[[i]]),5))))
+            if(tmp>1){
+             tmp <- NULL
+            } else {
+             tmp <- diff(time(object@data@zoo.data[[i]]))[1]
+            }
+            if(is.null(tmp)){
+                delta <- c(delta, NA)
+            } else {
+                delta <- c(delta, tmp)
+            }
+        }
+        
+        
+        cat(sprintf("\n\nNumber of zoo time series: %d\n", n.series))
+        tmp <- data.frame(length=n.length, time.min = t.min, time.max =t.max, delta=delta)
+        nm <- names(object@data@zoo.data)
+        if(is.null(nm)){
+         rownames(tmp) <- sprintf("Series %d",1:n.series)
+        } else {
+         rownames(tmp) <- nm
+        }
+        print(tmp)
+    }
+    
+})
+
