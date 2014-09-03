@@ -1,15 +1,15 @@
 94d55d512a9ba36caa9b7df079bae19f *COPYING
-08032efbf632c22074dc1cbaa9fb460e *DESCRIPTION
-071e3fda8ed81bb9e96adf503677b071 *NAMESPACE
+031dde02add025d98eb52aafe8148844 *DESCRIPTION
+2633fbe60a2ad9386ef3bd8dc0d9453e *NAMESPACE
 c14ace7eeb5ed405781317ca662c2c6d *NEWS
-88f93f4a6f4f1891c2efa763a8368caf *R/AllClasses.R
+8c28a0a6127e2e3b1213a6c803a1558e *R/AllClasses.R
 ecfdd33974bed758ee54d2ec06ce2232 *R/CPoint.R
 49eb6b85e1313ab3a26781c3c70bc192 *R/CarmaNoise.R
 4b3325c594164c1ef9e617555903b7ec *R/CholeskyfGn.R
 0c01e6158fccb23d3c93463835a7a9da *R/WoodChanfGn.R
-ade733cf8fce4b255d386c50265cab77 *R/adaBayes.R
-c1c7976024dade86faeb4c20ebc8ca51 *R/asymptotic_term_second.R
-45e8fcaef8cc69ec83fc897c19fef5ee *R/asymptotic_term_third.R
+b06c4bd529085416edd1e696748ea6ad *R/adaBayes.R
+7d012d423446202228dfae9756ec0341 *R/asymptotic_term_second.R
+086eafac945b90bdd0e1d07a46be37aa *R/asymptotic_term_third.R
 a2e9dba4d2ab571053806a3463dd0157 *R/asymptotic_term_third_function.R
 3878b53ad6b45165671e6992e19bcced *R/bns.test.R
 be74573aa14795bf124f04706a3c612c *R/cce.R
@@ -23,7 +23,7 @@ ee94a80376999cb09d7a5c984b520687 *R/noisy.sampling.R
 e920d4330c561d82faa6695675da2d3b *R/phi.test.R
 197ae3a057ce2b8309af7c30a30f3337 *R/poisson.random.sampling.R
 6590dec2df8596e6bb2309d9221d29bc *R/qgv.R
-7be3d2398dca1264f93b1ed6ec97bc4f *R/qmle.R
+f58491a1aaf8382c2a91719a14f88257 *R/qmle.R
 a81676b55b502aad5f261b664680f537 *R/rng.R
 1f567847cf9c65fa085f2f9a50d3e8e6 *R/sampling2grid.R
 b51ccb32c0eb42f1f41a2cb0f9146e32 *R/setCarma.R
@@ -38,7 +38,7 @@ edfabacecae0ebb9b40324f1d499b4b9 *R/yuima.characteristic.R
 e5347ae9c63c878226d4e14d20638cf5 *R/yuima.data.R
 56a8471869f97e9fb2e53ce8d5ce3252 *R/yuima.functional.R
 00b08aaaad567e676ada82c567893b06 *R/yuima.model.R
-9b57ed9bf41474d1364e7dd648b66337 *R/yuima.sampling.R
+e3c164669a627b3f16fc6da48e714da5 *R/yuima.sampling.R
 c1ee1ff8bddedff2f1dd24eeb10782c3 *R/zzz.R
 bce7107dc324a66a94865b56f9e3bbf3 *data/MWK151.rda
 ba391af8d40ef453c6d0a726d4170ffa *inst/AUTHORS
@@ -62,7 +62,7 @@ bc7cde41c45c90f70d5e39e4363ebbb3 *man/lasso.Rd
 1e62c8b5975366714ae0a052acb8b41c *man/phi.test.Rd
 7566b9ac61bee8350513827f37448cb7 *man/poisson.random.sampling.Rd
 b3165cb5569c8200e1951475a788de29 *man/qgv.Rd
-8b27ce8bddfee4369f4147f29e587860 *man/qmle.Rd
+edd884cb0899ffddeaaea9eb766505b3 *man/qmle.Rd
 3a21c90c366ccae181e12b2d671541f5 *man/rng.Rd
 462fdc39ca445291aa57448f8fa5b201 *man/setCarma.Rd
 ad4ddfb720691c328760854eda4d505b *man/setCharacteristic.Rd
@@ -76,6 +76,7 @@ c4a58981818f4b1e46ed4ea305d8d65b *man/simulate.Rd
 114989e6fbd3d202b0f3a6650a019abb *man/subsampling.Rd
 b1a949448d14837ea6b6a659b6aaa87f *man/toLatex.Rd
 4d6967e5c90892209f7bb705f20206dc *man/yuima-class.Rd
+ab1e99f44258125e416cee06598f2ca3 *man/yuima.CP.qmle-class.Rd
 28d1963ad07cdc1f7814fecda97d5a87 *man/yuima.carma-class.Rd
 e1ed99c84477013a2a1eea5dedc85149 *man/yuima.carma.qmle-class.Rd
 eef1fed04f5cfb5e46597d6189fbab1b *man/yuima.characteristic-class.Rd
