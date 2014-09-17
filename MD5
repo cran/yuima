@@ -1,8 +1,8 @@
 94d55d512a9ba36caa9b7df079bae19f *COPYING
-031dde02add025d98eb52aafe8148844 *DESCRIPTION
+0785012bf92f23a4c73ac83d90f413f8 *DESCRIPTION
 2633fbe60a2ad9386ef3bd8dc0d9453e *NAMESPACE
-c14ace7eeb5ed405781317ca662c2c6d *NEWS
-8c28a0a6127e2e3b1213a6c803a1558e *R/AllClasses.R
+699d2734e99372f91230d0226e8568d9 *NEWS
+17e800a7eabfb974e2c8accd78211a93 *R/AllClasses.R
 ecfdd33974bed758ee54d2ec06ce2232 *R/CPoint.R
 49eb6b85e1313ab3a26781c3c70bc192 *R/CarmaNoise.R
 4b3325c594164c1ef9e617555903b7ec *R/CholeskyfGn.R
@@ -23,7 +23,7 @@ ee94a80376999cb09d7a5c984b520687 *R/noisy.sampling.R
 e920d4330c561d82faa6695675da2d3b *R/phi.test.R
 197ae3a057ce2b8309af7c30a30f3337 *R/poisson.random.sampling.R
 6590dec2df8596e6bb2309d9221d29bc *R/qgv.R
-f58491a1aaf8382c2a91719a14f88257 *R/qmle.R
+ddcd4f8d400eaece33d1501205562ba3 *R/qmle.R
 a81676b55b502aad5f261b664680f537 *R/rng.R
 1f567847cf9c65fa085f2f9a50d3e8e6 *R/sampling2grid.R
 b51ccb32c0eb42f1f41a2cb0f9146e32 *R/setCarma.R
@@ -33,7 +33,7 @@ d6d8dbbbeb5b8950787d890e953d38ed *R/sim.euler.space.discretized.R
 4c491167e360daeb4b34816c979b9f8f *R/simulate.R
 f506cf2d30a5f912b5221112d7ae8965 *R/subsampling.R
 074dc2d814dee60f80b59ba5014cff4d *R/toLatex.R
-0c102377317b287a6f665362facdb132 *R/yuima.R
+168d7bc945d089427cf4f6dcd7adb9c2 *R/yuima.R
 edfabacecae0ebb9b40324f1d499b4b9 *R/yuima.characteristic.R
 e5347ae9c63c878226d4e14d20638cf5 *R/yuima.data.R
 56a8471869f97e9fb2e53ce8d5ce3252 *R/yuima.functional.R
@@ -78,10 +78,10 @@ b1a949448d14837ea6b6a659b6aaa87f *man/toLatex.Rd
 4d6967e5c90892209f7bb705f20206dc *man/yuima-class.Rd
 ab1e99f44258125e416cee06598f2ca3 *man/yuima.CP.qmle-class.Rd
 28d1963ad07cdc1f7814fecda97d5a87 *man/yuima.carma-class.Rd
-e1ed99c84477013a2a1eea5dedc85149 *man/yuima.carma.qmle-class.Rd
+b7d632c4c18a8ea2704a636546c8dddc *man/yuima.carma.qmle-class.Rd
 eef1fed04f5cfb5e46597d6189fbab1b *man/yuima.characteristic-class.Rd
 567d0e7cd9693628511083b185d6f480 *man/yuima.data-class.Rd
 14d129c89f98d6fc2237dd6a92705b73 *man/yuima.functional-class.Rd
 75b82c6075bfd6f69e2ebf7b02cd243a *man/yuima.model-class.Rd
 ffbff0dc3f384712fe20d939c8c9bd84 *man/yuima.sampling-class.Rd
-fc9334dfe6460408f49dbcf9ee837498 *src/cce_functions.c
+0bf98fc47e9537461ba9fc9805275f4d *src/cce_functions.c
