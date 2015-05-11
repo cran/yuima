@@ -27,7 +27,9 @@ exportClasses("yuima",
 	      "yuima.carma.qmle",
               "yuima.poisson",
               "yuima.qmle",
-              "yuima.CP.qmle"
+              "yuima.CP.qmle",
+        "cogarch.info",
+        "yuima.cogarch"
               )
 
 exportMethods(
@@ -72,6 +74,8 @@ export(setPoisson)
 export(dconst)
 export(rconst)
 
+export(setCogarch)
+
 export(dim)
 export(length)
 #export(start)
@@ -87,6 +91,7 @@ export(poisson.random.sampling)
 export(noisy.sampling)
 export(mpv)
 export(bns.test)
+export(hyavar) # asymptotic variance estimator for the Hayashi-Yoshida estimator
 
 export(get.zoo.data)
 
@@ -118,12 +123,15 @@ export(CPoint)
 export(qmleR)
 export(qmleL)
 
+
 export(CarmaNoise) # Estimates the Levy in carma model 
+export(gmm) # Estimation COGARCH(P,Q) using Method Of Moments 
+export(cogarchNoise)
+export(Diagnostic.Cogarch)
+
 
 export(qgv)
 export(mmfrac)
-
-
 
 export(cbind.yuima)
 
@@ -135,7 +143,7 @@ S3method(print, yuima.lasso)
 S3method(toLatex, yuima)
 S3method(toLatex, yuima.model)
 S3method(toLatex, yuima.carma)
-
+S3method(toLatex, yuima.cogarch)
 
 useDynLib(yuima)
 

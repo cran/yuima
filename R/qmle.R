@@ -1056,7 +1056,7 @@ if(!is.CARMA(yuima)){
     # INSERT HERE THE NECESSARY STEPS FOR FINDING THE PARAMETERS OF LEVY
    if(Est.Incr=="Carma.Inc"){
      # inc.levy.fin<-zoo(inc.levy,tt,frequency=1/env$h)
-     inc.levy.fin<-zoo(inc.levy[-1],tt[(1+length(tt)-length(inc.levy[-1])):length(tt)])
+     inc.levy.fin<-zoo(inc.levy,tt[(1+length(tt)-length(inc.levy)):length(tt)])
      carma_final_res<-new("yuima.carma.qmle", call = call, coef = coef, fullcoef = unlist(mycoef), 
                           vcov = vcov, min = min, details = oout, minuslogl = minusquasilogl, 
                           method = method, Incr.Lev = inc.levy.fin,
@@ -1121,7 +1121,10 @@ dummycovCarmaNoise<-vcov[unique(measure.par),unique(c(measure.par))] #we need to
         }
         
         if(aggregation==TRUE){
-          inc.levy1<-diff(cumsum(inc.levy)[seq(from=1,
+          if(floor(yuima@sampling@n/yuima@sampling@Terminal)!=yuima@sampling@n/yuima@sampling@Terminal){
+            yuima.stop("the n/Terminal in sampling information is not an integer. Set Aggregation=FALSE")
+          }
+          inc.levy1<-diff(cumsum(c(0,inc.levy))[seq(from=1,
                                                to=yuima@sampling@n[1],
                                                by=(yuima@sampling@n/yuima@sampling@Terminal)[1]
                                                )])
@@ -1222,7 +1225,10 @@ dummycovCarmaNoise<-vcov[unique(measure.par),unique(c(measure.par))] #we need to
           return(carma_final_res)
         }
         if(aggregation==TRUE){
-         inc.levy1<-diff(cumsum(inc.levy)[seq(from=1,
+          if(floor(yuima@sampling@n/yuima@sampling@Terminal)!=yuima@sampling@n/yuima@sampling@Terminal){
+            yuima.stop("the n/Terminal in sampling information is not an integer. Aggregation=FALSE is recommended")
+          }
+         inc.levy1<-diff(cumsum(c(0,inc.levy))[seq(from=1,
                                               to=yuima@sampling@n[1],
                                               by=(yuima@sampling@n/yuima@sampling@Terminal)[1]
          )])
@@ -1338,7 +1344,7 @@ dummycovCarmaNoise<-vcov[unique(measure.par),unique(c(measure.par))] #we need to
 #    carma_final_res<-list(mle=final_res,Incr=inc.levy,model=yuima) 
     if(Est.Incr=="Carma.IncPar"){
       #inc.levy.fin<-zoo(inc.levy,tt,frequency=1/env$h)
-      inc.levy.fin<-zoo(inc.levy[-1],tt[(1+length(tt)-length(inc.levy[-1])):length(tt)])
+      inc.levy.fin<-zoo(inc.levy,tt[(1+length(tt)-length(inc.levy)):length(tt)])
       carma_final_res<-new("yuima.carma.qmle", call = call, coef = coef, fullcoef = unlist(coef), 
                      vcov = cov, min = min, details = oout, minuslogl = minusquasilogl, 
                      method = method, Incr.Lev = inc.levy.fin,
@@ -1797,129 +1803,327 @@ MatrixA<-function (a)
 }
 
 
-yuima.Vinfinity<-function(elForVInf,v){
-  # We find the infinity stationary variance-covariance matrix
-  A<-elForVInf$A
-  sigma<-elForVInf$sigma
-#   #p<-dim(A)[1]
-#   p<-elForVInf$p
-  ATrans<-elForVInf$ATrans  
-  matrixV<-elForVInf$matrixV
-  matrixV[upper.tri(matrixV,diag=TRUE)]<-v
-  matrixV[lower.tri(matrixV)]<-matrixV[upper.tri(matrixV)]
-#  l<-rbind(matrix(rep(0,p-1),p-1,1),1)
-#  matrixV<-matrix(v,p,p)
-
-  lTrans<-elForVInf$lTrans
-  l<-elForVInf$l
-  
-  
-  RigSid<-l%*%elForVInf$lTrans
-  Matrixobj<-A%*%matrixV+matrixV%*%ATrans+sigma^2*RigSid
-  obj<-sum(Matrixobj^2)
-  obj
-}
+# yuima.Vinfinity<-function(elForVInf,v){
+#   # We find the infinity stationary variance-covariance matrix
+#   A<-elForVInf$A
+#   sigma<-elForVInf$sigma
+# #   #p<-dim(A)[1]
+# #   p<-elForVInf$p
+#   ATrans<-elForVInf$ATrans  
+#   matrixV<-elForVInf$matrixV
+#   matrixV[upper.tri(matrixV,diag=TRUE)]<-v
+#   matrixV<-as.matrix(forceSymmetric(matrixV))
+# #matrixV[lower.tri(matrixV)]<-matrixV[upper.tri(matrixV)]
+# #  l<-rbind(matrix(rep(0,p-1),p-1,1),1)
+# #  matrixV<-matrix(v,p,p)
+# 
+#   lTrans<-elForVInf$lTrans
+#   l<-elForVInf$l
+#   
+#   
+#   RigSid<-l%*%elForVInf$lTrans
+#   Matrixobj<-A%*%matrixV+matrixV%*%ATrans+sigma^2*RigSid
+#   obj<-sum(Matrixobj^2)
+#   obj
+# }
 
 
 #carma.kalman<-function(y, tt, p, q, a,bvector, sigma){
-carma.kalman<-function(y, u, p, q, a,bvector, sigma, times.obs, V_inf0){
-    
-  # V_inf0<-matrix(diag(rep(1,p)),p,p)
-  
+carma.kalman<-function(y, u, p, q, a,bvector, sigma, times.obs, V_inf0){  
+  #new Code
   A<-MatrixA(a)
-  # u<-diff(tt)[1]
-  
-  
-#  Amatx<-yuima.carma.eigen(A)
-#   expA<-Amatx$vectors%*%expm(diag(Amatx$values*u),
-#                              method="Pade",
-#                              order=6, 
-#                              trySym=TRUE,
-#                              do.sparseMsg = TRUE)%*%solve(Amatx$vectors)
-  
-#   if(!is.complex(Amatx$values)){
-#     expA<-Amatx$vectors%*%diag(exp(Amatx$values*u))%*%solve(Amatx$vectors)
-#     }else{
-      expA<-expm(A*u,method="Pade",order=6, trySym=FALSE, do.sparseMsg = FALSE)
-#    }
-  #expA<-yuima.exp(A*u)
-  
-  v<-as.numeric(V_inf0[upper.tri(V_inf0,diag=TRUE)])
-    
-  ATrans<-t(A)
-  matrixV<-matrix(0,p,p)
-  #l.dummy<-c(rep(0,p-1),1)
-  l<-rbind(matrix(rep(0,p-1),p-1,1),1)
-  #l<-matrix(l.dummy,p,1)
-  #lTrans<-matrix(l.dummy,1,p)
-  lTrans<-t(l)
-  elForVInf<-new.env()
-  elForVInf$A<-A
-  elForVInf$ATrans<-ATrans
-  elForVInf$lTrans<-lTrans
-  elForVInf$l<-l
-  elForVInf$matrixV<-matrixV
-  elForVInf$sigma<-sigma
-#   elForVInf<-list(A=A,
-#                   ATrans=ATrans,
-#                   lTrans=lTrans,
-#                   l=l,
-#                   matrixV=matrixV,
-#                   sigma=sigma)
-#   
-   V_inf_vect<-nlm(yuima.Vinfinity, v,
-                   elForVInf = elForVInf)$estimate
-#  V_inf_vect<-nlminb(start=v,objective=yuima.Vinfinity, elForVInf = elForVInf)$par
-#  V_inf_vect<-optim(par=v,fn=yuima.Vinfinity,method="L-BFGS-B", elForVInf = elForVInf)$par
-  V_inf<-matrix(0,p,p)
-  
-  V_inf[upper.tri(V_inf,diag=TRUE)]<-V_inf_vect
-  V_inf[lower.tri(V_inf)]<-V_inf[upper.tri(V_inf)]
-  
-  V_inf[abs(V_inf)<=1.e-06]=0
+  expA<-expm(A*u,method="Pade",order=6, trySym=FALSE, do.sparseMsg = FALSE)
+
+  V_inf<-V0inf(a,p,sigma)
   
   expAT<-t(expA)
-  #SIGMA_err<-V_inf-expA%*%V_inf%*%t(expA)
-  SigMatr<-V_inf-expA%*%V_inf%*%expAT
-  statevar<-matrix(rep(0, p),p,1)
-  Qmatr<-SigMatr
   
-  # set
-  #statevar<-statevar0
+  Qmatr <- V_inf - expA %*% V_inf %*% expAT
   
-  # SigMatr<-expA%*%V_inf%*%t(expA)+Qmatr
+  statevar<-numeric(length=p)
+ 
+  SigMatr <- V_inf+0
   
-  #SigMatr<-Qmatr
-  SigMatr<-V_inf
-  
-  zc<-matrix(bvector,1,p)
-  loglstar <- 0
-  loglstar1 <- 0
-  
-#  zcT<-matrix(bvector,p,1)
-  zcT<-t(zc)
-  for(t in 1:times.obs){ 
-    # prediction
-    statevar<-expA%*%statevar
-    SigMatr<-expA%*%SigMatr%*%expAT+Qmatr
-    # forecast
-    Uobs<-y[t]-zc%*%statevar
-    dum.zc<-zc%*%SigMatr
-    sd_2<-dum.zc%*%zcT
-    # sd_2<-zc%*%SigMatr%*%zcT
-    Inv_sd_2<-1/sd_2
-    #correction
-    Kgain<-SigMatr%*%zcT%*%Inv_sd_2    
-    statevar<-statevar+Kgain%*%Uobs
-    #SigMatr<-SigMatr-Kgain%*%zc%*%SigMatr
-    SigMatr<-SigMatr-Kgain%*%dum.zc
-    term_int<--0.5*(log(sd_2)+Uobs%*%Uobs%*%Inv_sd_2)
-    loglstar<-loglstar+term_int
-  }
-  return(list(loglstar=(loglstar-0.5*log(2*pi)*times.obs),s2hat=sd_2))
+  sd_2<-0
+  Result<-numeric(length=2)
+  Kgain<-numeric(length=p)
+  dum_zc<-numeric(length=p)
+  Mat22int<-numeric(length=(p*p))
+
+  loglstar<- .Call("Cycle_Carma", y, statevar, expA, as.integer(length(y)),
+                    as.integer(p), Qmatr, SigMatr, bvector, Result, Kgain, 
+                   dum_zc, Mat22int,
+                    PACKAGE="yuima")
+  return(list(loglstar=loglstar[1]-0.5*log(2*pi)*times.obs,s2hat=loglstar[2]))
+
+#   # Old version
+# 
+#   
+#   V_inf0<-matrix(diag(rep(1,p)),p,p)
+#   
+#   A<-MatrixA(a)
+#   # u<-diff(tt)[1]
+#   
+#   
+#   #  Amatx<-yuima.carma.eigen(A)
+#   #   expA<-Amatx$vectors%*%expm(diag(Amatx$values*u),
+#   #                              method="Pade",
+#   #                              order=6, 
+#   #                              trySym=TRUE,
+#   #                              do.sparseMsg = TRUE)%*%solve(Amatx$vectors)
+#   
+#   #   if(!is.complex(Amatx$values)){
+#   #     expA<-Amatx$vectors%*%diag(exp(Amatx$values*u))%*%solve(Amatx$vectors)
+#   #     }else{
+#   expA<-expm(A*u,method="Pade",order=6, trySym=FALSE, do.sparseMsg = FALSE)
+#   #    }
+#   #expA<-yuima.exp(A*u)
+#   
+#   v<-as.numeric(V_inf0[upper.tri(V_inf0,diag=TRUE)])
+#   
+#   ATrans<-t(A)
+#   matrixV<-matrix(0,p,p)
+#   #l.dummy<-c(rep(0,p-1),1)
+#   l<-rbind(matrix(rep(0,p-1),p-1,1),1)
+#   #l<-matrix(l.dummy,p,1)
+#   #lTrans<-matrix(l.dummy,1,p)
+#   lTrans<-t(l)
+#   elForVInf<-new.env()
+#   elForVInf$A<-A
+#   elForVInf$ATrans<-ATrans
+#   elForVInf$lTrans<-lTrans
+#   elForVInf$l<-l
+#   elForVInf$matrixV<-matrixV
+#   elForVInf$sigma<-sigma
+#   #   elForVInf<-list(A=A,
+#   #                   ATrans=ATrans,
+#   #                   lTrans=lTrans,
+#   #                   l=l,
+#   #                   matrixV=matrixV,
+#   #                   sigma=sigma)
+#   #   
+#   V_inf_vect<-nlm(yuima.Vinfinity, v,
+#                   elForVInf = elForVInf)$estimate
+#   #  V_inf_vect<-nlminb(start=v,objective=yuima.Vinfinity, elForVInf = elForVInf)$par
+#   #  V_inf_vect<-optim(par=v,fn=yuima.Vinfinity,method="L-BFGS-B", elForVInf = elForVInf)$par
+#   V_inf<-matrix(0,p,p)
+#   
+#   V_inf[upper.tri(V_inf,diag=TRUE)]<-V_inf_vect
+#   V_inf<-forceSymmetric(V_inf)
+#   
+#   V_inf[abs(V_inf)<= 1.e-06]=0
+# 
+# #      A<-MatrixA(a)
+# #      expA<-expm(A*u,method="Pade",order=6, trySym=FALSE, do.sparseMsg = FALSE)
+# #    
+# #      V_inf<-V0inf(a,p,sigma)
+#   #   
+#   
+#   
+#   expAT<-t(expA)
+#   #SIGMA_err<-V_inf-expA%*%V_inf%*%t(expA)
+#   SigMatr<-V_inf-expA%*%V_inf%*%expAT
+#   statevar<-matrix(rep(0, p),p,1)
+#   Qmatr<-SigMatr
+#   
+#   # set
+#   #statevar<-statevar0
+#   
+#   # SigMatr<-expA%*%V_inf%*%t(expA)+Qmatr
+#   
+#   #SigMatr<-Qmatr
+#   SigMatr<-V_inf
+#   
+#   zc<-matrix(bvector,1,p)
+#   loglstar <- 0
+#   loglstar1 <- 0
+#   
+#   #  zcT<-matrix(bvector,p,1)
+#   zcT<-t(zc)
+#   for(t in 1:times.obs){ 
+#     # prediction
+#     statevar<-expA%*%statevar
+#     SigMatr<-expA%*%SigMatr%*%expAT+Qmatr
+#     # forecast
+#     Uobs<-y[t]-zc%*%statevar
+#     dum.zc<-zc%*%SigMatr
+#     sd_2<-dum.zc%*%zcT
+#     # sd_2<-zc%*%SigMatr%*%zcT
+#     Inv_sd_2<-1/sd_2
+#     #correction
+#     Kgain<-SigMatr%*%zcT%*%Inv_sd_2    
+#     statevar<-statevar+Kgain%*%Uobs
+#     #SigMatr<-SigMatr-Kgain%*%zc%*%SigMatr
+#     SigMatr<-SigMatr-Kgain%*%dum.zc
+#     term_int<--0.5*(log(sd_2)+Uobs%*%Uobs%*%Inv_sd_2)
+#     loglstar<-loglstar+term_int
+#   }
+#   return(list(loglstar=(loglstar-0.5*log(2*pi)*times.obs),s2hat=sd_2))
 }
 
+V0inf<-function(a,p,sigma){
+  # This code is based on the paper A continuous-time ARMA process Tsai-Chan 2000
+  # we need to find the values along the diagonal
+  #l<-c(numeric(length=(p-1)),0.5)
+  # B_{p*p}V^{*}_{p*1}=-sigma^2*l/2
+  B<-matrix(0,nrow=p,ncol=p)
+  aa <- -rev(a)
+#   B1<-.Call("Coeffdiag_B", as.integer(p), aa, B,
+#         PACKAGE="yuima")
+#   B<-matrix(0,nrow=p,ncol=p)
+  for(i in 1:p){
+    # Condition on B
+    for(j in 1:p){
+      if ((2*j-i) %in% c(1:p)){ 
+        B[i,j]<-(-1)^(j-i)*aa[2*j-i]
+      }
+      if((2*j-i)==(p+1)){
+        B[i,j]<-(-1)^(j-i-1)
+      }
+    }  
+  }
+  Vdiag <- -solve(B)[,p]*0.5*sigma^2
+  V <- diag(Vdiag)
+  # we insert the values outside the diagonal
+  for(i in 1:p){
+    for(j in (i+1):p){
+      if((i+j)  %% 2 == 0){ # if even
+        V[i,j]=(-1)^((i-j)/2)*V[(i+j)/2,(i+j)/2]
+        V[j,i]=V[i,j]
+      }
+    }
+  }
+  return(V)
+}
 
+# CycleCarma<-function(y, statevar, expA, times.obs=integer(),
+#                      p=integer(), Qmatr, SigMatr, zc, loglstar){
+# #   expAT=t(expA)
+# #   zcT=t(zc)
+#  # for(t in 1:times.obs){ 
+# #   t=1
+# # #     # prediction
+# #     statevar <- expA %*% statevar
+# #     SigMatr <- expA %*% SigMatr %*% t(expA) + Qmatr
+# #     # forecast
+# #     Uobs <- y[t] - zc %*% statevar # 1 - 1Xp px1
+# #     dum.zc <- zc %*% SigMatr  # 1xp pxp
+# #     sd_2 <- dum.zc %*% t(zc)  # 1xp px1
+# #     Inv_sd_2 <- 1/sd_2
+# #     #correction
+# #     Kgain <- SigMatr %*%  t(zc) %*% Inv_sd_2 # pxp px1*1
+# #     statevar <- statevar+Kgain %*% Uobs # px1+px1
+# #     SigMatr <- SigMatr - Kgain %*% dum.zc # pxp-px1 1x+
+# #     term_int<- -0.5 * (log(sd_2)+ Uobs %*% Uobs %*% Inv_sd_2) # every entries are scalars 
+# #     loglstar <- loglstar + term_int # every entries are scalars
+# #   }
+# #   expA=matrix(c(1:16),nrow=4,ncol=4)
+# #   SigMatr=matrix(c(1:16),nrow=4,ncol=4)+1
+# #   Qmatr=matrix(c(1:16),nrow=4,ncol=4)+2
+# #   vvvvv<-expA%*%SigMatr
+# #   ppppp<-expA%*%SigMatr%*%t(expA)+Qmatr
+#   rY=as.numeric(y)
+#   rStateVar=as.numeric(statevar)
+#   rExpA=as.numeric(expA)
+#   rtime_obs=times.obs
+#   p=p
+#   rQmatr=as.numeric(Qmatr)
+#   rSigMatr=as.numeric(SigMatr)
+#   rZc=as.numeric(zc)
+#   rLogstar=loglstar
+#   In_dum=0
+#   sd_2=0
+#   rMat21=numeric(length=p)
+#   rdum_zc=numeric(length=p)
+#   rMat22int=numeric(length=p*p)
+#   rMat22est=numeric(length=p*p)
+#   rKgain=numeric(length=p)
+#   for(t in 1:rtime_obs){
+#     # prediction
+#     for(i in 1:p){
+#       rMat21[(i-1)+1] = 0
+#       for(j in 1:p){
+#         #     statevar <- expA %*% statevar: px1=pxp px1
+#         rMat21[(i-1)+1] = rMat21[(i-1)+1]+rExpA[(i-1)+(j-1)*p+1]*rStateVar[(j-1)+1]
+#       }
+#         rStateVar[(i-1)+1] = rMat21[(i-1)+1]  #     statevar <- expA %*% statevar 
+#     }
+#    
+# #   SigMatr <- expA %*% SigMatr %*% expAT + Qmatr: pxp = pxp pxp pxp
+#       # First We compute rMat22int <- expA %*% SigMatr : pxp = pxp pxp 
+#     for(i in 1:p){
+#       for(j in 1:p){
+#         rMat22int[(i-1)+(j-1)*p+1]=0
+#         for(h in 1:p){
+#             rMat22int[(i-1)+(j-1)*p+1]=rMat22int[(i-1)+(j-1)*p+1]+rExpA[(i-1)+(h-1)*p+1]*
+#             rSigMatr[(h-1)+(j-1)*p+1]
+#         }
+#       }
+#     }
+#       # Second We compute rMat22est <- rMat22int %*% t(expA) + Qmatr: pxp = pxp pxp + pxp 
+#     for(i in 1:p){
+#       for(j in 1:p){
+#         rMat22est[(i-1)+(j-1)*p+1]=0
+#         for(h in 1:p){
+#           rMat22est[(i-1)+(j-1)*p+1]=rMat22est[(i-1)+(j-1)*p+1]+rMat22int[(i-1)+(h-1)*p+1]*rExpA[(j-1)+(h-1)*p+1]
+#           
+#         }
+#         rSigMatr[(i-1)+(j-1)*p+1]=rMat22est[(i-1)+(j-1)*p+1]+rQmatr[(i-1)+(j-1)*p+1]
+#       }
+#     }
+# #     # forecast
+# 
+# #     Uobs <- y[t] - zc %*% statevar # 1 - 1Xp px1
+#       rMat22est[1]=0
+#     for(i in c(1:p)){
+#       rMat22est[1]=rMat22est[1]+rZc[i]*rStateVar[i]
+#     }  
+#     Uobs=rY[t]-rMat22est[1]
+# 
+#  #   dum.zc <- zc %*% SigMatr  # 1xp pxp
+#  
+#     
+#     for(i in c(1:p)){
+#       rdum_zc[i]=0
+#       for(j in c(1:p)){
+#         rdum_zc[i]=rdum_zc[i]+rZc[j]*rSigMatr[(i-1)*h+j-1+1]        
+#       }
+#     }
+# #     sd_2 <- dum.zc %*% zcT  # 1xp px1   
+#     sd_2=0
+#     for(i in c(1:p)){
+#         sd_2=sd_2+rdum_zc[i]*rZc[i]
+#     }
+# #     #correction
+# #   Kgain <- SigMatr %*% zcT %*% 1/sd_2 # pxp px1*1
+#     for(i in c(1:p)){
+#       rMat21[i]=0
+#       for(j in c(1:p)){
+#         rMat21[i]=rMat21[i]+rSigMatr[(i-1)+(j-1)*p+1]*rZc[j]      
+#       }
+#       rKgain[i]=rMat21[i]/sd_2
+#     }
+# 
+# 
+# #     statevar <- statevar+Kgain %*% Uobs # px1+px1
+#      for(i in c(1:p)){
+#        rStateVar[i] = rStateVar[i] + rKgain[i]*Uobs 
+#      }
+# #     SigMatr <- SigMatr - Kgain %*% dum.zc # pxp-px1 1xp
+#     for(i in c(1:p)){
+#       for(j in c(1:p)){
+#         rSigMatr[(i-1)+(j-1)*p+1] =rSigMatr[(i-1)+(j-1)*p+1]-rKgain[i]*rdum_zc[j] 
+#       }
+#     }
+#   
+#      term_int = -0.5 * (log(sd_2)+ Uobs * Uobs * 1/sd_2) # every entries are scalars 
+#      loglstar = loglstar + term_int # every entries are scalars
+# 
+#     
+#   }
+#   Res<-matrix(c(loglstar,sd_2),nrow=2,ncol=1)
+#   return(Res)
+# }
 
 yuima.PhamBreton.Alg<-function(a){
   p<-length(a)
@@ -2338,14 +2542,20 @@ minusloglik.Lev<-function(par,env){
       beta<-par[2]
       delta<-par[3]
       mu<-par[4]
-      -sum(log(dNIG(env$data,alpha,beta,delta,mu)))
+      f<-dNIG(env$data,alpha,beta,delta,mu)
+      v<-log(as.numeric(na.omit(f)))
+      v1<-v[!is.infinite(v)]
+      -sum(v1) 
     }else{
       if(env$measure=="rngamma"){
         lambda<-par[1]
         alpha<-par[2]
         beta<-par[3]
         mu<-par[4]
-        -sum(log(dngamma(env$data,lambda,alpha,beta,mu)))
+        f<-dngamma(env$data,lambda,alpha,beta,mu)
+        v<-log(as.numeric(na.omit(f)))
+        v1<-v[!is.infinite(v)]
+        -sum(v1) 
       }else{
         if(env$measure=="rIG"){
           delta<-par[1]
@@ -2647,7 +2857,7 @@ yuima.Estimation.Lev<-function(Increment.lev,param0,
   }else{warning("the start value for levy measure is outside of the admissible region")}
   
   env$aggregation<-aggregation
-  if(is.na(paramLev)){
+  if(is.na(paramLev[1])){
     covLev<-matrix(NA,length(paramLev),length(paramLev))
   }else{
     covLev<-Lev.hessian(params=paramLev,env)
