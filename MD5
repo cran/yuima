@@ -1,7 +1,7 @@
 94d55d512a9ba36caa9b7df079bae19f *COPYING
-2d1f6089fe0eed51e65b8036f521908c *DESCRIPTION
+11a0d3e4b8ef7c110c86c88335702fa9 *DESCRIPTION
 8c9b9ea96bfe598d06e02ab13eedf38d *NAMESPACE
-238d5aef6accb7ce58e3377d53997f58 *NEWS
+58a831c08c6c39c40f935e260b6a5924 *NEWS
 86f3ae6987c8a36c75b0be09a879ed5c *R/AllClasses.R
 ecfdd33974bed758ee54d2ec06ce2232 *R/CPoint.R
 dd610167315ee57f6b5921a5da017867 *R/CarmaNoise.R
@@ -55,7 +55,7 @@ cd8687c920284fc3afb12b9638fa70d2 *inst/COPYRIGHTS
 1c61255f47e28af617c8eee89bc652b3 *man/CPoint.Rd
 2ff567959c3646587b4eea7855f3fd40 *man/CarmaNoise.Rd
 f6cedc6c81529d87e7e7bdad57f28308 *man/Diagnostic.Cogarch.Rd
-055e9a102fcf02b4f9419311839f5675 *man/MWK151.Rd
+33b5307defeed5658299f5aec563673e *man/MWK151.Rd
 8d58fd161183296785e5b46c700957cb *man/adaBayes.Rd
 246cfd2ae45d70a7082f4ca558a946a3 *man/asymptotic_term.Rd
 cd4c530aef0469d9b86787b2dd843bcd *man/bns.test.Rd
@@ -105,4 +105,4 @@ eef1fed04f5cfb5e46597d6189fbab1b *man/yuima.characteristic-class.Rd
 068fee21cdb050ca6f46be8739cc25b7 *man/yuima.poisson-class.Rd
 ffbff0dc3f384712fe20d939c8c9bd84 *man/yuima.sampling-class.Rd
 ee7fcd7f5abf1295e327b6d2f606ba1f *src/carmafilter.c
-f1826a4887ff9ce03bfd191ad9b9c8b3 *src/cce_functions.c
+e1d17e22d322bf406f6d67454d60b775 *src/cce_functions.c
