@@ -1,14 +1,15 @@
 Package: yuima
 Type: Package
 Title: The YUIMA Project Package for SDEs
-Version: 1.0.71
-Depends: methods, zoo, stats4, utils, expm, cubature, mvtnorm
+Version: 1.0.73
+Depends: R(>= 2.10.0), methods, zoo, stats4, utils, expm, cubature,
+        mvtnorm
 Author: YUIMA Project Team
 Maintainer: Stefano M. Iacus <stefano.iacus@unimi.it>
 Description: Simulation and Inference for Stochastic Differential Equations.
 License: GPL-2
 URL: http://R-Forge.R-project.org/projects/yuima/
 NeedsCompilation: yes
-Packaged: 2015-05-14 06:24:16 UTC; jago
+Packaged: 2015-07-15 15:48:41 UTC; jago
 Repository: CRAN
-Date/Publication: 2015-05-14 09:25:46
+Date/Publication: 2015-07-16 00:12:56
