@@ -815,7 +815,7 @@ aux.simulateCogarch<-function(object, nsim, seed, xinit, true.parameter,
 
 # Simulate method for an object of class cogarch.gmm.incr
 
-setMethod("simulate","cogarch.gmm.incr",
+setMethod("simulate","cogarch.est.incr",
           function(object, nsim=1, seed=NULL, xinit,  ...){
 
               out <-aux.simulategmm(object=object, nsim=nsim, seed=seed, xinit=xinit, ...)
@@ -834,7 +834,7 @@ aux.simulategmm<-function(object, nsim=1, seed=NULL, xinit, ...){
   Time<-index(object@Incr.Lev)
   Incr.L<-coredata(object@Incr.Lev)
 
-  model <- object@model
+  model <- object@yuima@model
   EndT <- Time[length(Time)]
   numb <- (length(Incr.L)+1)
   valpar<-coef(object)

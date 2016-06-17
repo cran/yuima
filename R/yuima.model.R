@@ -56,7 +56,7 @@ setMethod("initialize", "model.parameter",
 #                    J.flag){
 #             .Object@drift <- drift
 #             .Object@diffusion <- diffusion
-# 			.Object@hurst <- hurst		   
+# 			.Object@hurst <- hurst
 #             .Object@jump.coeff <- jump.coeff
 #             .Object@measure <- measure
 #             .Object@measure.type <- measure.type
@@ -73,8 +73,8 @@ setMethod("initialize", "model.parameter",
 #             return(.Object)
 #           })
 
-# 23/11 we need to provide the default values for the yuima.model object class 
-# in order to construct a new class that inherits from yuima.model class   
+# 23/11 we need to provide the default values for the yuima.model object class
+# in order to construct a new class that inherits from yuima.model class
 
 setMethod("initialize", "yuima.model",
           function(.Object,
@@ -97,7 +97,7 @@ setMethod("initialize", "yuima.model",
                    J.flag = logical()){
             .Object@drift <- drift
             .Object@diffusion <- diffusion
-            .Object@hurst <- hurst		   
+            .Object@hurst <- hurst
             .Object@jump.coeff <- jump.coeff
             .Object@measure <- measure
             .Object@measure.type <- measure.type
@@ -130,20 +130,38 @@ setModel <- function(drift=NULL,
                      solve.variable,
                      xinit=NULL){
   ## we need a temp env for simplifications
-  
+  if(!is.null(jump.coeff)){
+    if(is.matrix(jump.coeff)){
+      if(dim(jump.coeff)[2]!=1){
+        intensity <- NULL
+        df <- as.list(measure[["df"]])
+        if(any(measure.type=="CP")){
+          intensity <- measure[["intensity"]]
+        }
+        res <- setMultiModel(drift = drift, diffusion = diffusion,
+          hurst = hurst, jump.coeff = jump.coeff,
+          intensity = intensity, df = df,
+          measure.type = measure.type, state.variable = state.variable,
+          jump.variable = jump.variable, time.variable = time.variable,
+          solve.variable = solve.variable, xinit= xinit)
+        return(res)
+      }
+    }
+  }
+
   yuimaENV <- new.env()
   ##::measure and jump term #####################################
-  
+
   ##::initialize objects ########
   MEASURE <- list()
-  
+
   ##::end initialize objects ########
-  
+
   ##::make type function list ####
   CPlist <- c("dnorm", "dgamma", "dexp", "dconst")
-  codelist <- c("rIG", "rNIG", "rgamma", "rbgamma", "rngamma", "rstable")
+  codelist <- c("rIG", "rNIG", "rgamma", "rbgamma", "rvgamma", "rstable")
   ##::end make type function list ####
-  
+
   if(!length(measure.type)){
     if( length(jump.coeff) || length(measure) ){
       yuima.warn("measure type does not match with jump term.")
@@ -155,13 +173,13 @@ setModel <- function(drift=NULL,
     if( !length(jump.coeff) || !length(measure) ){
       yuima.warn("measure type isn't matched with jump term.")
       return(NULL)
-   # }else 
+   # }else
       #       if(length(jump.coeff)!=1){
       #        yuima.warn("multi dimentional jump term is not supported yet.")
-      # 
+      #
       #         return(NULL)
       #     }
-      
+
     } else if(measure.type=="CP"){ ##::CP
         #        if(length(measure)!=2){
         # yuima.warn(paste("length of measure must be two on type", measure.type, "."))
@@ -179,7 +197,7 @@ setModel <- function(drift=NULL,
           if(is.null(tmpc)){
             names(measure) <- c("intensity", "df","dimension")
           }else{
-            whichint <- match("intensity", tmpc)            
+            whichint <- match("intensity", tmpc)
             whichdf <- match("df", tmpc)
             if(!is.na(whichint)){
               if(names(measure)[-whichint]=="" || names(measure)[-whichint]=="df"){
@@ -202,7 +220,7 @@ setModel <- function(drift=NULL,
           }
           ##::end naming measure list ########
         }
-        
+
         ##::check df name ####################
         tmp <- regexpr("\\(", measure$df)[1]
         measurefunc <- substring(measure$df, 1, tmp-1)
@@ -215,18 +233,18 @@ setModel <- function(drift=NULL,
         MEASURE$df$func <- eval(parse(text=measurefunc))
         MEASURE$df$expr <- parse(text=measure$df)
         MEASURE$intensity <- parse(text=measure$intensity)
-        
-        measure.par <- unique( c( all.vars(MEASURE$intensity), all.vars(MEASURE$df$expr) ) ) 
+
+        measure.par <- unique( c( all.vars(MEASURE$intensity), all.vars(MEASURE$df$expr) ) )
         ##measure.par$intensity <- unique(all.vars(MEASURE$intensity))
         ##::end check df name ####################
         ##::end CP
-     
+
       } else if(measure.type=="code"){ ##::code
         if(length(measure)!=1){
           yuima.warn(paste("length of measure must be one on type", measure.type, "."))
           return(NULL)
         }
-        
+
         if(!is.list(measure)){
           measure <- list(df=measure)
         }else{
@@ -243,7 +261,7 @@ setModel <- function(drift=NULL,
           }
           ##::end naming measure list #############
         }
-        
+
         ##::check df name ####################
         tmp <- regexpr("\\(", measure$df)[1]
         measurefunc <- substring(measure$df, 1, tmp-1)
@@ -255,7 +273,7 @@ setModel <- function(drift=NULL,
         }
         ##MEASURE$df$func <- eval(parse(text=measurefunc))
         MEASURE$df$expr <- parse(text=measure$df)
-        
+
         measure.par <- unique(all.vars(MEASURE$df$expr))
         ##::end check df name ####################
         ##::end code
@@ -264,7 +282,7 @@ setModel <- function(drift=NULL,
           yuima.warn(paste("length of measure must be one on type", measure.type, "."))
           return(NULL)
         }
-        
+
         if(!is.list(measure)){
           measure <- list(df=measure)
         }else{
@@ -272,7 +290,7 @@ setModel <- function(drift=NULL,
             yuima.warn("multi dimentional jump term is not supported yet.")
             return(NULL)
           }
-          
+
           ##::naming measure list #############
           if(is.null(names(measure))){
             names(measure) <- "df"
@@ -282,7 +300,7 @@ setModel <- function(drift=NULL,
           }
           ##::end naming measure list #############
         }
-        
+
         ##::check df name ####################
         tmp <- regexpr("\\(", measure[[names(measure)]])[1]
         measurefunc <- substring(measure[[names(measure)]], 1, tmp-1)
@@ -295,7 +313,7 @@ setModel <- function(drift=NULL,
         }
         MEASURE[[names(measure)]]$func <- eval(parse(text=measurefunc))
         MEASURE[[names(measure)]]$expr <- parse(text=measure[[names(measure)]])
-        
+
         measure.par <- unique(all.vars(MEASURE[[names(measure)]]$expr))
         ##::end check df name ####################
         ##::end density
@@ -306,9 +324,9 @@ setModel <- function(drift=NULL,
     n.eqn3 <- 1
     n.jump <- 1
   }
-  
+
   ##::end measure and jump term #####################################
-  
+
   ##:: check for errors and reform values
   if(any(time.variable %in% state.variable)){
     yuima.warn("time and state(s) variable must be different.")
@@ -321,7 +339,7 @@ setModel <- function(drift=NULL,
     n.eqn1 <- dim(drift)[1]
     n.drf <- dim(drift)[2]
   }
-  
+
   if(is.null(dim(diffusion))){ # this is a vector
     n.eqn2 <- length(diffusion)
     n.noise <- 1
@@ -329,26 +347,26 @@ setModel <- function(drift=NULL,
     n.eqn2 <- dim(diffusion)[1]
     n.noise <- dim(diffusion)[2]
   }
-  
+
   if(is.null(diffusion)){
     diffusion <- rep("0", n.eqn1)
     n.eqn2 <- n.eqn1
     n.noise <- 1
   }
-  
+
   ## TBC
   n.eqn3 <- n.eqn1
-  
+
   if(!length(measure)){
     n.eqn3 <- n.eqn1
   }
-  
+
   if(n.eqn1 != n.eqn2 || n.eqn1 != n.eqn3){
     yuima.warn("Malformed model, number of equations in the drift and diffusion do not match.")
     return(NULL)
   }
   n.eqn <- n.eqn1
-  
+
   if(is.null(xinit)){
     # xinit <- numeric(n.eqn)
     xinit <- character(n.eqn)
@@ -360,7 +378,7 @@ setModel <- function(drift=NULL,
       return(NULL)
     }
   }
-  
+
   if(missing(solve.variable)){
     yuima.warn("Solution variable (lhs) not specified. Trying to use state variables.")
     solve.variable <- state.variable
@@ -369,18 +387,18 @@ setModel <- function(drift=NULL,
     yuima.warn("Malformed model, number of solution variables (lhs) do no match number of equations (rhs).")
     return(NULL)
   }
-  
+
   loc.drift <- matrix(drift, n.eqn, n.drf)
   loc.diffusion <- matrix(diffusion, n.eqn, n.noise)
   # Modification starting point 6/11
   loc.xinit<-matrix(xinit,n.eqn,n.drf)
-  
+
   ##:: allocate vectors
   DRIFT <- vector(n.eqn, mode="expression")
   DIFFUSION <- vector(n.eqn, mode="list")
   # Modification starting point 6/11
   XINIT<-vector(n.eqn, mode = "expression")
-  
+
   ##:: function to make expression from drift characters
   pre.proc <- function(x){
     for(i in 1:length(x)){
@@ -413,11 +431,11 @@ setModel <- function(drift=NULL,
       if(length(expr)==0){
         expr <- expression(0)  # expr must have something
       }
-#       DIFFUSION[[i]][j] <- expr  
+#       DIFFUSION[[i]][j] <- expr
       #22/11
       DIFFUSION[[i]][j] <- yuima.Simplifyobj(expr)
     }
-#22/11     
+#22/11
 
 #if (length(JUMP)>0){
 #    JUMP[i] <- parse(text=jump.coeff[i])
@@ -468,24 +486,24 @@ if(length(jump.coeff)==0){
 #print(str(JUMP))
 
  #
- 
+
   ##:: get parameters in drift expression
   drift.par <- unique(all.vars(DRIFT))
   # Modification starting point 6/11
   xinit.par <- unique(all.vars(XINIT))
-  
+
   drift.idx <- as.numeric(na.omit(match(c(state.variable, time.variable, jump.variable, solve.variable), drift.par)))
   if(length(drift.idx)>0){
     drift.par <- drift.par[-drift.idx]
   }
-  
+
   ##:: get parameters in diffusion expression
   diff.par <- unique(unlist(lapply(DIFFUSION, all.vars)))
   diff.idx <- as.numeric(na.omit(match(c(state.variable, time.variable, jump.variable, solve.variable), diff.par)))
   if(length(diff.idx)>0){
     diff.par <- diff.par[-diff.idx]
   }
-  
+
   ##:: get parameters in jump expression
   J.flag <- FALSE
   #  jump.par <- unique(all.vars(JUMP))
@@ -499,34 +517,34 @@ if(length(jump.coeff)==0){
   if(length(jump.idx)>0){
     jump.par <- jump.par[-jump.idx]
   }
-  
+
   ##:: get parameters in measure expression
   measure.idx <- as.numeric(na.omit(match(c(state.variable, time.variable, jump.variable, solve.variable), measure.par)))
   if(length(measure.idx)>0){
     measure.par <- measure.par[-measure.idx]
   }
-  
+
   ##:: order parameters for 'yuima.pars'
   ##id1 <- which(diff.par %in% drift.par)
   ##id2 <- which(drift.par %in% diff.par)
   ##common <- unique(c(diff.par[id1], drift.par[id2]))
   common <- c(drift.par, diff.par)
   common <- common[duplicated(common)]
-  
+
   common1<-common
-  # modification 06/11 common1 contains only 
-  # parameters that appear in both drift and diffusion terms.   
-  
-  # Modification 06/11 common contains only parameters that appear 
-  # in drift, diff, Jump and xinit      
+  # modification 06/11 common1 contains only
+  # parameters that appear in both drift and diffusion terms.
+
+  # Modification 06/11 common contains only parameters that appear
+  # in drift, diff, Jump and xinit
   if (length(xinit)) {
     common <- c(common, xinit.par)
     common <- common[duplicated(common)]
     common <- c(common, xinit.par)
     common <- common[duplicated(common)]
   }
-  
-  
+
+
   if(length(measure)){
     common <- c(common, jump.par)
     common <- common[duplicated(common)]
@@ -535,7 +553,7 @@ if(length(jump.coeff)==0){
   }
   #   all.par <- unique(c(drift.par, diff.par, jump.par, measure.par))
   all.par <- unique(c(drift.par, diff.par, jump.par, measure.par, xinit.par))
-  
+
   ##:: instanciate class
   tmppar <- new("model.parameter",
                 all= all.par,
@@ -553,7 +571,7 @@ if(length(jump.coeff)==0){
              jump.coeff=JUMP,
              measure= MEASURE,
              measure.type= measure.type,
-             parameter= tmppar, 
+             parameter= tmppar,
              state.variable= state.variable,
              jump.variable= jump.variable,
              time.variable= time.variable,
@@ -571,4 +589,215 @@ if(length(jump.coeff)==0){
              xinit= XINIT,
              J.flag <- J.flag)
   return(tmp)
+}
+# yuima.model rbind
+
+# setGeneric("rbind.yuima",
+#            function(x, ...)
+#              standardGeneric("rbind.yuima")
+# )
+
+# setMethod("cbind.yuima", signature(x="yuima"),
+#           function(x, ...){
+#             ##:: init
+#             y.list <- list(x, ...)
+#             y.num <- length(y.list)
+#
+#             ##:: bind yuima.data in yuima
+#
+#             ##:: return result
+#             return(NULL)
+#           }
+# )
+
+# setMethod("rbind.yuima", signature(x="yuima.model"),
+#           function(x, ...){
+#             y.list <- list(x, ...)
+#             y.num <- length(y.list)
+#             res <- aux.rbind.model(y.list,y.num)
+#             return(res)
+#           }
+# )
+
+rbind.yuima.model <- function(x, ...){
+
+  y.list <- list(x, ...)
+#  y.list1 <- lapply(y.list, FUN = only.yuima.model)
+  y.num <- length(y.list)
+  new.list <- list()
+  for(i in (1:y.num)){
+    if(is(y.list[[i]],"yuima.model"))
+          new.list[i] <- y.list[[i]]
+  }
+  new.y.num <- length(new.list)
+  res <- aux.rbind.model(y.list = new.list,
+        y.num = new.y.num, mycall = y.list)
+  return(res)
+}
+
+aux.rbind.model<-function(y.list,y.num, mycall=list()){
+  lapply(y.list, FUN = check.yuima.model)
+  check.lev <- lapply(y.list, FUN = check.yuima.levy)
+  check.lev <- unlist(check.lev)
+  drift <- lapply(y.list, FUN = extract.model, type = "drift")
+  diffusion <- lapply(y.list, FUN = extract.model, type = "diffusion")
+  solve.variable <- lapply(y.list, FUN = extract.model, type = "solve.variable")
+  state.variable <- lapply(y.list, FUN = extract.model, type = "state.variable")
+  xinit <- lapply(y.list, FUN = extract.model, type = "xinit")
+  noise.number <- lapply(y.list, FUN = extract.model, type = "noise.number")
+  equation.number <- lapply(y.list, FUN = extract.model, type = "equation.number")
+  #Until Here only diffusion process
+  drift <- lapply(drift, FUN = ExpToString)
+  drift <- unlist(drift)
+  # drift
+  nrow.diff <- sum(unlist(equation.number))
+  ncol.diff <- sum(unlist(noise.number))
+  matr.diff <- matrix("0", nrow = nrow.diff, ncol = ncol.diff)
+  extrinf <- 1
+  extrsup <- noise.number[[1]]
+  j <- 1
+  cond.eq <- equation.number[[1]]
+  cond.eq1 <- 0
+  for(i in c(1:nrow.diff)){
+     if(i <= cond.eq){
+        dum <- ExpToString(diffusion[[j]][[i-cond.eq1]])
+        matr.diff[i,extrinf:extrsup] <- dum
+        if(i == equation.number[[j]]){
+          extrinf <- extrsup+1
+          j <- j+1
+          if(j <= nrow.diff){
+            extrsup <- extrsup +  equation.number[[j]]
+            cond.eq1 <- i
+            cond.eq <- cond.eq +  equation.number[[j]]
+          }
+        }
+     }
+  }
+  solve.variable <- lapply(solve.variable, FUN = ExpToString, cond = FALSE)
+  solve.variable <- unlist(solve.variable)
+  state.variable <- lapply(state.variable, FUN = ExpToString, cond = FALSE)
+  state.variable <- unlist(state.variable)
+  xinit <- lapply(xinit, FUN = ExpToString, cond = FALSE)
+  xinit <- unlist(xinit)
+  if(!any(check.lev)){
+    mod <- setModel(drift = drift, diffusion = matr.diff,
+      solve.variable = solve.variable, state.variable = state.variable,
+      xinit = xinit)
+  }else{
+    MultiLevy <- y.list[check.lev]
+    jump.coeff <- lapply(MultiLevy,
+      FUN = extract.model, type = "jump.coeff")
+    ncol.jump <- lapply(jump.coeff, FUN = numb.jump)
+    dum.ncolj <- unlist(ncol.jump)
+    ncol.jump <- sum(unlist(dum.ncolj))
+    jump.coeff <- lapply(y.list,
+      FUN = extract.model, type = "jump.coeff")
+    #ncol.jump1 <- lapply(jump.coeff, FUN = numb.jump)
+    matr.jump <- matrix("0",nrow = nrow.diff,
+      ncol = ncol.jump)
+    j <- 1
+    h <- 0
+    cond.eqa <- equation.number[[j]]
+    cond.eqb <- 0
+    extrinf <- 1
+    extrsup <- 1
+    if(check.lev[j])
+      extrsup <- dum.ncolj[j]
+    else{
+      h <- h+1
+    }
+    for(i in c(1:nrow.diff)){
+      if(i <= cond.eqa){
+        if(check.lev[j]){
+          dum <- ExpToString(jump.coeff[[j]][[i-cond.eqb]])
+          matr.jump[i, extrinf:extrsup] <- dum
+        }else{
+#          matr.jump[i,] <- matr.jump[i,]
+        }
+        if(i == cond.eqa){
+          cond.eqb <- i
+          j <- j+1
+          if(j<=length(equation.number))
+                cond.eqa <- cond.eqa + equation.number[[j]]
+          if(check.lev[j-1]){
+            extrinf <- extrsup + 1
+            extrsup <- extrsup + dum.ncolj[j-h]
+          }else{
+            extrinf <- extrinf
+            extrsup <- extrsup
+            h <- h+1
+          }
+        }
+      }
+    }
+
+    # mod <- matr.jump
+#     measure <- lapply(y.list,
+#        FUN = extract.model, type = "measure")
+#     measure
+    df <- NULL
+  if("df" %in% names(mycall))
+      df <- mycall$df
+    measure.type <- NULL
+  if("measure.type" %in% names(mycall))
+      measure.type <- mycall$measure.type
+    intensity <-NULL
+    if("intensity" %in% names(mycall))
+      intensity <- mycall$intensity
+    time.variable <- "t"
+    if("time.variable" %in% names(mycall))
+      time.variable <- mycall$time.variable
+  mod <- setMultiModel(drift=drift, diffusion = matr.diff,
+    jump.coeff =  matr.jump, solve.variable = solve.variable,
+    xinit = xinit, time.variable = time.variable, df= df,
+    intensity = intensity, measure.type = measure.type)
+
+  }
+  return(mod)
+}
+# only.yuima.model<- function(y.list){
+#   if(is(y.list,"yuima.model")){
+#     return(y.list)
+#   }else{
+#     NULL
+#   }
+# }
+numb.jump <- function(x){length(x[[1]])}
+
+check.yuima.levy <- function(x){
+  Levy <- FALSE
+  if(length(x@measure.type)>0){
+    if(!is(x, "yuima.model")){
+      yuima.stop("the Levy model have to belong to the yuima.multimodel class")
+    }
+    Levy <- TRUE
+  }
+  return(Levy)
+}
+
+ExpToString <- function(x, cond = TRUE){
+  dum <- unlist(strsplit(toString(x),split=", "))
+  if(cond)
+    dum <- substr(dum, 2, nchar(dum)-1)
+  return(dum)
+}
+
+extract.model <- function(x, type = "drift"){
+  res<- slot(x,type)
+  return(res)
+}
+
+check.yuima.model <- function(x){
+  if(is.CARMA(x)){
+    yuima.warn("The cbind for CARMA will be implemented as soon as possible")
+    return(NULL)
+  }
+  if(is.COGARCH(x)){
+    yuima.warn("The cbind for COGARCH will be implemented as soon as possible")
+    return(NULL)
+  }
+  if(is.Poisson(x)){
+    yuima.warn("The cbind for Poisson will be implemented as soon as possible")
+    return(NULL)
+  }
 }

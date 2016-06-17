@@ -74,7 +74,12 @@ exportClasses("yuima",
 "yuima.Output",
 "info.Output",
 "param.Output",
-"yuima.multimodel"
+"yuima.multimodel",
+"param.Integral",
+"variable.Integral",
+"Integrand",
+"Integral.sde",
+"yuima.Integral"
 )
 
 exportMethods(
@@ -104,6 +109,7 @@ exportMethods(
 "Fnorm",
 "asymptotic_term",
 "cbind.yuima"
+#"rbind.yuima"
 )
 
 ## function which we want to expose to the user
@@ -120,8 +126,9 @@ export(dconst)
 export(rconst)
 
 export(setCogarch)
-export(setMaps)
-export(setMultiModel)
+export(setMap)
+#export(setMultiModel)
+export(setIntegral)
 
 export(dim)
 export(length)
@@ -147,8 +154,8 @@ export(get.zoo.data)
 ##export(ql,rql,ml.ql)
 ##export(rql)
 export(adaBayes)
-export(rIG, rNIG, rbgamma, rngamma, rstable) ##:: random number generator for Inverse Gaussian
-export(dIG, dNIG, dbgamma, dngamma) ##:: random number generator for I\
+export(rIG, rNIG, rbgamma, rvgamma, rstable,rpts,rnts) ## random number generators in rng.R
+export(dIG, dNIG, dbgamma, dvgamma) ## pdfs in rng.R
 export(limiting.gamma)
 
 
@@ -185,7 +192,7 @@ export(qgv)
 export(mmfrac)
 
 export(cbind.yuima)
-
+#export(rbind.yuima)
 S3method(print, phitest)
 S3method(print, qgv)
 S3method(print, mmfrac)
@@ -199,6 +206,7 @@ S3method(toLatex, yuima)
 S3method(toLatex, yuima.model)
 S3method(toLatex, yuima.carma)
 S3method(toLatex, yuima.cogarch)
+S3method(rbind, yuima.model)
 
 S3method(plot, yuima.llag) # Oct. 10, 2015
 S3method(plot, yuima.mllag) # Oct. 10, 2015

@@ -122,7 +122,7 @@ is.CARMA <- function(obj){
 }
 
 qmle <- function(yuima, start, method="BFGS", fixed = list(), print=FALSE,
- lower, upper, joint=FALSE, Est.Incr="Carma.IncPar",aggregation=TRUE, threshold=NULL, ...){
+ lower, upper, joint=FALSE, Est.Incr="NoIncr",aggregation=TRUE, threshold=NULL, ...){
   if(is(yuima@model, "yuima.carma")){
     NoNeg.Noise<-FALSE
     cat("\nStarting qmle for carma ... \n")
@@ -144,10 +144,10 @@ qmle <- function(yuima, start, method="BFGS", fixed = list(), print=FALSE,
 	 res <- NULL
 	 if("grideq" %in% names(as.list(call)[-(1:2)])){
 	 res  <- PseudoLogLik.COGARCH(yuima, start, method=method, fixed = list(),
-	                       lower, upper, Est.Incr, call, ...)
+	                       lower, upper, Est.Incr, call, aggregation = aggregation, ...)
 	 }else{
 	   res  <- PseudoLogLik.COGARCH(yuima, start, method=method, fixed = list(),
-	                         lower, upper, Est.Incr, call, grideq = FALSE,...)
+	                         lower, upper, Est.Incr, call, grideq = FALSE, aggregation = aggregation,...)
 	 }
 
 	 return(res)
@@ -373,6 +373,7 @@ qmle <- function(yuima, start, method="BFGS", fixed = list(), print=FALSE,
 		yuima.stop("some named arguments in 'start' are not arguments to the supplied yuima model")
     start <- start[order(oo)]
     nm <- names(start)
+
 
 	idx.diff <- match(diff.par, nm)
 	idx.drift <- match(drift.par, nm)
@@ -619,6 +620,8 @@ if(length(measure.par)>0){
 			mydots$hessian <- FALSE
 			mydots$upper <- as.numeric(unlist( upper[ nm[idx.diff] ]))
 			mydots$lower <- as.numeric(unlist( lower[ nm[idx.diff] ]))
+			mydots$joint <- NULL # LM 08/03/16
+			mydots$aggregation <- NULL # LM 08/03/16
             mydots$threshold <- NULL #SMI 2/9/14
 
            if((length(mydots$par)>1) | any(is.infinite(c(mydots$upper,mydots$lower)))){
@@ -675,7 +678,8 @@ if(length(measure.par)>0){
 			mydots$hessian <- FALSE
 			mydots$upper <- unlist( upper[ nm[idx.drift] ])
 			mydots$lower <- unlist( lower[ nm[idx.drift] ])
-
+			mydots$joint <- NULL # LM 08/03/16
+			mydots$aggregation <- NULL # LM 08/03/16# LM 08/03/16
 
 
 
@@ -1003,12 +1007,12 @@ if(length(c(idx.fixed,idx.measure)>0))  # SMI 2/9/14
           method = method, nobs=yuima.nobs, model=yuima@model)
       }
   } else {
-    if( Est.Incr=="Carma.IncPar" || Est.Incr=="Carma.Inc" ){
+    if( Est.Incr=="IncrPar" || Est.Incr=="Incr" ){
     final_res<-new("yuima.carma.qmle", call = call, coef = coef, fullcoef = unlist(mycoef),
                    vcov = vcov, min = min, details = oout, minuslogl = minusquasilogl,
                     method = method, nobs=yuima.nobs, logL.Incr = NULL)
     }else{
-      if(Est.Incr=="Carma.Par"){
+      if(Est.Incr=="NoIncr"){
       final_res<-new("mle", call = call, coef = coef, fullcoef = unlist(mycoef),
                      vcov = vcov, min = min, details = oout, minuslogl = minusquasilogl,
                      method = method, nobs=yuima.nobs)
@@ -1228,7 +1232,7 @@ dummycovCarmaNoise<-vcov[unique(measure.par),unique(c(measure.par))] #we need to
 
       }
       if(yuima@model@measure.type=="code"){
-  #     #  "rIG", "rNIG", "rgamma", "rbgamma", "rngamma"
+  #     #  "rIG", "rNIG", "rgamma", "rbgamma", "rvgamma"
         name.func.dummy <- as.character(model@measure$df$expr[1])
         name.func<- substr(name.func.dummy,1,(nchar(name.func.dummy)-1))
         names.measpar<-as.vector(strsplit(name.func,', '))[[1]][-1]
@@ -1302,7 +1306,7 @@ dummycovCarmaNoise<-vcov[unique(measure.par),unique(c(measure.par))] #we need to
                                          length(coef[ names.measpar]))
                            )
         }
-        if(measurefunc=="rngamma"){
+        if(measurefunc=="rvgamma"){
 #           result.Lev<-yuima.Estimation.VG(Increment.lev=inc.levy1,param0=coef[ names.measpar],
 #                                           fixed.carma=fixed.carma,
 #                                           lower.carma=lower.carma,
@@ -2553,7 +2557,7 @@ dCPGam<-function(x,lambda,shape,scale){
 }
 
 
-minusloglik.Lev<-function(par,env){
+minusloglik.Lev <- function(par,env){
   if(env$measure.type=="code"){
     if(env$measure=="rNIG"){
       alpha<-par[1]
@@ -2565,12 +2569,12 @@ minusloglik.Lev<-function(par,env){
       v1<-v[!is.infinite(v)]
       -sum(v1)
     }else{
-      if(env$measure=="rngamma"){
+      if(env$measure=="rvgamma"){
         lambda<-par[1]
         alpha<-par[2]
         beta<-par[3]
         mu<-par[4]
-        f<-dngamma(env$data,lambda,alpha,beta,mu)
+        f<-dvgamma(env$data,lambda,alpha,beta,mu)
         v<-log(as.numeric(na.omit(f)))
         v1<-v[!is.infinite(v)]
         -sum(v1)
@@ -2640,13 +2644,13 @@ Lev.hessian<-function (params,env){
         v1<-v[!is.infinite(v)]
         return(sum(v1))
       }else{
-        if(env$measure=="rngamma"){
+        if(env$measure=="rvgamma"){
           lambda<-params[1]
           alpha<-params[2]
           beta<-params[3]
           mu<-params[4]
-          #return(sum(log(dngamma(env$data,lambda,alpha,beta,mu))))
-          f<-dngamma(env$data,lambda,alpha,beta,mu)
+          #return(sum(log(dvgamma(env$data,lambda,alpha,beta,mu))))
+          f<-dvgamma(env$data,lambda,alpha,beta,mu)
           v<-log(as.numeric(na.omit(f)))
           v1<-v[!is.infinite(v)]
           return(sum(v1))
@@ -2702,7 +2706,7 @@ Lev.hessian<-function (params,env){
       if(env$measure=="rNIG"){
         Matr.dum<-diag(c(1,1,1/env$dt,1/env$dt))
       }else{
-        if(env$measure=="rngamma"){
+        if(env$measure=="rvgamma"){
           Matr.dum<-diag(c(1/env$dt,1,1,1/env$dt))
         }else{
           if(env$measure=="rIG"){
@@ -2749,7 +2753,7 @@ yuima.Estimation.Lev<-function(Increment.lev,param0,
         param0[3]<-param0[3]*dt
         param0[4]<-param0[4]*dt
       }else{
-        if(env$measure=="rngamma"){
+        if(env$measure=="rvgamma"){
           #Matr.dum<-diag(c(1/env$dt,1,1,1/env$dt))
           param0[1]<-param0[1]*dt
           param0[4]<-param0[4]*dt
@@ -2778,7 +2782,7 @@ yuima.Estimation.Lev<-function(Increment.lev,param0,
       ui<-rbind(c(1, -1, 0, 0),c(1, 1, 0, 0),c(1, 0, 0, 0),c(0, 0, 1, 0))
       ci<-c(0,0,0,10^(-6))
     }else{
-      if(measure=="rngamma"){
+      if(measure=="rvgamma"){
         ui<-rbind(c(1,0, 0, 0),c(0, 1, 1, 0),c(0, 1,-1, 0),c(0, 1,0, 0))
         ci<-c(10^-6,10^-6,10^(-6), 0)
       }else{
@@ -2895,7 +2899,7 @@ yuima.Estimation.Lev<-function(Increment.lev,param0,
         paramLev[3]<-paramLev[3]/dt
         paramLev[4]<-paramLev[4]/dt
         }else{
-          if(env$measure=="rngamma"){
+          if(env$measure=="rvgamma"){
             #Matr.dum<-diag(c(1/env$dt,1,1,1/env$dt))
             paramLev[1]<-paramLev[1]/dt
             paramLev[4]<-paramLev[4]/dt
@@ -3052,7 +3056,7 @@ yuima.Estimation.Lev<-function(Increment.lev,param0,
 #     alpha<-par[2]
 #     beta<-par[3]
 #     mu<-par[4]
-#     -sum(log(dngamma(data,lambda,alpha,beta,mu)))
+#     -sum(log(dvgamma(data,lambda,alpha,beta,mu)))
 #   }
 #
 #   data<-Increment.lev
@@ -3130,7 +3134,7 @@ yuima.Estimation.Lev<-function(Increment.lev,param0,
 #       beta<-params[3]
 #       mu<-params[4]
 #
-#       return(sum(log(dngamma(data,lambda,alpha,beta,mu))))
+#       return(sum(log(dvgamma(data,lambda,alpha,beta,mu))))
 #     }
 #     # hessian <- tsHessian(param = params, fun = logLik.VG)
 #     #hessian<-optimHess(par, fn, gr = NULL,data=data)
