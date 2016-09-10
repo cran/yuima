@@ -16,7 +16,7 @@ importFrom("stats", "qchisq")
 importFrom("utils", "relist")
 
 #08/07/2016
-#exportPattern("^[[:alpha:]]+")
+#exportPattern("^[[:alpha:]]+") # NEVER DO THIS AGAIN PLEASE!
 importFrom(Rcpp, evalCpp)
 
 # 03/07/2015
@@ -166,6 +166,7 @@ export(adaBayes)
 export(rIG, rNIG, rbgamma, rvgamma, rstable,rpts,rnts) ## random number generators in rng.R
 export(dIG, dNIG, dbgamma, dvgamma) ## pdfs in rng.R
 export(limiting.gamma)
+export(lambdaFromData)
 
 
 export(setFunctional)
