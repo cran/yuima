@@ -1,5 +1,5 @@
 # Method for Map
-setMethod("simulate", "yuima.Output",
+setMethod("simulate", "yuima.Map",
                     function(object, nsim=1, seed=NULL, xinit, true.parameter,
                              space.discretized=FALSE, increment.W=NULL, increment.L=NULL, method="euler",
                              hurst, methodfGn="WoodChan",
@@ -51,7 +51,7 @@ aux.simulatOutput<-function(object, nsim, seed, xinit,
       my.data<-cbind(my.data,
         eval(object@Output@formula[[i]]))
     }
-  }  
+  }
   names(my.data)<-object@Output@param@out.var
 
   data1 <- setData(my.data)
@@ -105,7 +105,7 @@ aux.simulatIntegral <- function(object, nsim = nsim, seed = seed,
   #Simulation Internal trajectories
   sim.Inputs <- simulate(mod1, nsim, seed, xinit, true.parameter,
     space.discretized, increment.W, increment.L, method, hurst,
-    methodfGn, sampling, subsampling)
+    methodfGn, sampling)
 
   # Data of underlying SDE
 
@@ -176,5 +176,7 @@ aux.simulatIntegral <- function(object, nsim = nsim, seed = seed,
   my.data <- zoo(x = t(res), order.by = time)
   data1 <- setData(my.data)
   object@data <- data1
- return(object)
+  if(missing(subsampling))
+    return(object)
+  subsampling(object, subsampling)
 }
