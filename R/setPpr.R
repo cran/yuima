@@ -1,5 +1,5 @@
 setPpr <- function(yuima, counting.var="N", gFun, Kernel,
-                   var.dx, var.dt = "s", lambda.var = "lambda",
+                   var.dx= "s", var.dt = "s", lambda.var = "lambda",
                    lower.var="0", upper.var = "t",
                    nrow =1 ,ncol=1){
 
@@ -62,16 +62,77 @@ aux.setPpr <-function(yuima, counting.var="N", gFun, Kernel,
   yuima1 <- setYuima(model =yuima)
   type <- yuima@measure.type
   if(type == "code"){
-    measure <- list(df = as.character(yuima@measure$df$expr))
-  }
+    if(!(is(yuima@measure$df,"yuima.law")))
+      measure <- list(df = as.character(yuima@measure$df$expr))
+  }else{
+    measure <- yuima@measure
+    }
   if(type == "CP"){
-    measure <- list(intensity = as.character(yuima@measure$intensity),
+    if(!(is(yuima@measure$df,"yuima.law")))
+      measure <- list(intensity = as.character(yuima@measure$intensity),
                     df= as.character(yuima@measure$df$expr))
+  }else{
+    measure <- yuima@measure
   }
+  IntensWithCount<-FALSE
+  if(!is.list(g@Output@formula)){
+    if(any(counting.var%in%all.vars(g@Output@formula)))
+       IntensWithCount<-TRUE
+  }else{
+    ddd<- length(g@Output@formula)
+    for(i in c(1:ddd)){
+      if(any(counting.var%in%all.vars(g@Output@formula[[i]])))
+        IntensWithCount<-TRUE
+    }
+  }
+  if(any(counting.var%in%Integral@Integral@variable.Integral@var.dx))
+     IntensWithCount<-TRUE
+
+  if(!is.list(Integral@Integral@Integrand@IntegrandList)){
+    if(any(counting.var%in%all.vars(Integral@Integral@Integrand@IntegrandList)))
+      IntensWithCount<-TRUE
+  }else{
+    ddd<- length(Integral@Integral@Integrand@IntegrandList)
+    for(i in c(1:ddd)){
+      if(any(counting.var%in%all.vars(Integral@Integral@Integrand@IntegrandList[[i]])))
+        IntensWithCount<-TRUE
+    }
+  }
+
+  RegressWithCount <- FALSE
+
   if(general){
     covariates<-character()
     if(sum(!(counting.var==yuima@solve.variable))!=0){
-      covariates<-yuima@solve.variable[!(counting.var==yuima@solve.variable)]
+      condCovariate<-!(counting.var==yuima@solve.variable)
+      covariates<-yuima@solve.variable[condCovariate]
+      if(length(covariates)>0){
+        covariate.drift <- yuima@drift[condCovariate]
+        covariate.diff <- yuima@diffusion[condCovariate]
+        covariate.jump <- yuima@jump.coeff[condCovariate]
+      }
+      if(any(counting.var %in% all.vars(covariate.drift))){
+        RegressWithCount <-TRUE
+      }
+
+      ddd.dif <-length(covariate.diff)
+      if(length(covariate.diff)>0){
+        for(i in c(1:ddd.dif)){
+          if(any(counting.var %in% all.vars(covariate.diff[[i]]))){
+            RegressWithCount <-TRUE
+          }
+        }
+      }
+
+      ddd.jump <-length(covariate.jump)
+      if(length(covariate.jump)>0){
+        for(i in c(1:ddd.jump)){
+          if(any(counting.var %in% all.vars(covariate.jump[[i]]))){
+            RegressWithCount <-TRUE
+          }
+        }
+      }
+
     }
     Ppr <- new("info.Ppr",
                allparam = paramHawkes$allparam,
@@ -84,7 +145,9 @@ aux.setPpr <-function(yuima, counting.var="N", gFun, Kernel,
                covariates = covariates,
                var.dt = var.dt,
                additional.info = lambda.var,
-               Info.measure = list(type=type,measure=measure))
+               Info.measure = list(type=type,measure=measure),
+               RegressWithCount=RegressWithCount,
+               IntensWithCount=IntensWithCount)
 
 
     ret <- new("yuima.Ppr", Ppr = Ppr,

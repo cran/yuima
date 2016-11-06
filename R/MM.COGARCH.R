@@ -231,7 +231,8 @@ gmm<-function(yuima, data = NULL, start, method="BFGS", fixed = list(),
 
   # Data
   assign("Data",  as.matrix(onezoo(observ)[,1]), envir=env)
-  assign("deltaData",  n/index(observ@zoo.data[[1]])[n], envir=env)
+  #assign("deltaData",  (n-1)/index(observ@zoo.data[[1]])[n], envir=env)
+  assign("deltaData",  1/yuima@sampling@delta, envir=env)
   assign("time.obs",length(env$Data),envir=env)
 
 
@@ -255,7 +256,7 @@ gmm<-function(yuima, data = NULL, start, method="BFGS", fixed = list(),
   assign("objFun",objFun, envir=env)
 
   if(aggr.G==TRUE){
-    if(floor(n/index(observ@zoo.data[[1]])[n])!=env$deltaData){
+    if(floor(env$deltaData)!=env$deltaData){
       yuima.stop("the n/Terminal in sampling information is not an integer. equally.spaced=FALSE is recommended")
     }
   }
@@ -1142,7 +1143,8 @@ setMethod("summary", "cogarch.est",
                        m2logL = 0,
                        #model = object@model,
                        objFun = labFun,
-                       objFunVal = obj
+                       objFunVal = obj,
+                       object = object
             )
             tmp
           }
@@ -1175,6 +1177,20 @@ setMethod("show", "summary.cogarch.est",
               cat("\n",paste0(paste("Log.objFun", object@objFun),":"), object@objFunVal, "\n")
             }
               #cat("objFun", object@min, "\n")
+            dummy <- Diagnostic.Cogarch(object@object, display = FALSE)
+            info <- object@object@yuima@model@info
+            nameMod <- paste0("Cogarch(",info@p,
+              ",", info@q, ") model:", collapse = "")
+            if(dummy$stationary){
+              cat("\n", nameMod, "Stationarity conditions are satisfied.\n")
+            }else{
+              cat("\n", nameMod, "Stationarity conditions are not satisfied.\n")
+            }
+            if(dummy$positivity){
+              cat("\n", nameMod, "Variance process is positive.\n")
+            }else{
+              cat("\n", nameMod, "Variance process is not positive.\n")
+            }
           }
 )
 
@@ -1198,7 +1214,8 @@ setMethod("summary", "cogarch.est.incr",
                        logLI = object@logL.Incr,
                        TypeI = object@yuima@model@measure.type,
                        NumbI = length(data),
-                       StatI =summary(data)
+                       StatI =summary(data),
+                       object = object
             )
             tmp
           }
@@ -1230,6 +1247,20 @@ setMethod("show", "summary.cogarch.est.incr",
             cat("\nSummary statistics for increments:\n")
             print(object@StatI)
             cat("\n")
+            dummy <- Diagnostic.Cogarch(object@object, display = FALSE)
+            info <- object@object@yuima@model@info
+            nameMod <- paste0("Cogarch(",info@p,
+                              ",", info@q, ") model:", collapse = "")
+            if(dummy$stationary){
+              cat("\n", nameMod, "Stationarity conditions are satisfied.\n")
+            }else{
+              cat("\n", nameMod, "Stationarity conditions are not satisfied.\n")
+            }
+            if(dummy$positivity){
+              cat("\n", nameMod, "Variance process is positive.\n")
+            }else{
+              cat("\n", nameMod, "Variance process is not positive.\n")
+            }
           }
 )
 
