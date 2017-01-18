@@ -45,6 +45,26 @@ setMethod("simulate", "yuima.Ppr",
           }
 )
 
+constHazIntPr <- function(g.Fun , Kern.Fun){
+  numb.Int <- length(g.Fun)
+  Int.Intens <- list()
+  for(i in c(1:numb.Int)){
+    dum.g <- as.character(g.Fun[i])
+    dum.Ker <- as.character(Kern.Fun@Integrand@IntegrandList[[i]])
+    dif.dx <- paste("d",Kern.Fun@variable.Integral@var.dx, sep="")
+    dum.Ker <- paste(dum.Ker,dif.dx, sep = "*")
+    if(length(dum.Ker)>1){
+      dum.Ker <- paste(dum.Ker,collapse = "+")
+    }
+    dum.Ker <- paste("(",dum.Ker,") * (")
+    cond.Sup <- paste(Kern.Fun@variable.Integral@var.time, "<", Kern.Fun@variable.Integral@upper.var)
+    dum.Ker <- paste(dum.Ker, cond.Sup, ")")
+    dum.Ker <- paste0("sum(",dum.Ker,")")
+    Int.Intens[[i]] <- parse(text = paste(dum.g, dum.Ker, sep = " + "))
+  }
+  res <- list(Intens = Int.Intens)
+}
+
 aux.simulatPpr<- function(object, nsim = nsim, seed = seed,
                xinit = xinit, true.parameter = true.parameter,
                space.discretized = space.discretized, increment.W = increment.W,
@@ -125,12 +145,19 @@ aux.simulatPprROldNew<-function(object, nsim = nsim, seed = seed,
     auxIntMy <- matrix(auxIntMy, Kern@Integrand@dimIntegrand[1],
       Kern@Integrand@dimIntegrand[2], byrow=T)
 
-
-    auxInt <- setIntegral(yuima = Model,
+    if(object@Kernel@variable.Integral@var.dx==object@Kernel@variable.Integral@var.time){
+      auxInt <- setIntegral(yuima = Model,
         integrand = auxIntMy,
         var.dx = Model@time.variable,
         upper.var = dummyUpperTime,
         lower.var = Kern@variable.Integral@lower.var)
+    }else{
+      auxInt <- setIntegral(yuima = Model,
+                            integrand = auxIntMy,
+                            var.dx =object@Kernel@variable.Integral@var.dx ,
+                            upper.var = dummyUpperTime,
+                            lower.var = Kern@variable.Integral@lower.var)
+    }
     randomGenerator<-object@model@measure$df
     if(samp@regular){
       tForMeas<-samp@delta
@@ -146,6 +173,11 @@ aux.simulatPprROldNew<-function(object, nsim = nsim, seed = seed,
       }
       Noise.L <- t(rand(object = randomGenerator, n=NumbIncr, param=measureparam))
       Noise.W <- t(rnorm(NumbIncr, 0,tForMeas))
+      if(length(object@model@diffusion[[1]])>1){
+        for(i in c(2:length(object@model@diffusion[[1]]))){
+          Noise.W <- rbind(Noise.W, rnorm(NumbIncr, 0,tForMeas))
+        }
+      }
     if(missing(xinit)){
       simg <- simulate(object = auxg, true.parameter = true.parameter[auxg@Output@param@allparam],
                      sampling = samp, hurst = hurst,
@@ -169,8 +201,10 @@ aux.simulatPprROldNew<-function(object, nsim = nsim, seed = seed,
           globPos <- c(globPos,Pos)
         }
       }
+      globPos <- unique(globPos)
+      globPos <- globPos[(globPos<=samp@n)]
       NewNoise.L <- Noise.L
-      cod <- object@Ppr@counting.var%in%Model@solve.variable
+      cod <-Model@solve.variable%in%object@Ppr@counting.var
       NeWNoise.W<-Noise.W
       NeWNoise.W[cod,] <- 0
       NewNoise.L[cod,] <- 0
@@ -188,9 +222,512 @@ aux.simulatPprROldNew<-function(object, nsim = nsim, seed = seed,
                        sampling = samp)
       }
     }
+  }else{
+    if(!object@Ppr@RegressWithCount && object@Ppr@IntensWithCount){
+      ## Here we consider the case where we have a counting variable in the intensity but
+      ## we haven't it in the coefficients of the covariates.
+
+      # Simulation of the noise
+      DummyT <- c(true.parameter[Model@parameter@measure], samp@delta)
+      names(DummyT) <- c(names(true.parameter[Model@parameter@measure]),
+                         Model@time.variable)
+      increment.L <- rand(object = Model@measure$df,
+               n = samp@n ,
+               param = DummyT)
+      if(!is.matrix(increment.L)){
+        increment.L <- matrix(increment.L,ncol = 1)
+      }
+      if(missing(xinit)){
+        simMod <- simulate(object = Model, hurst = hurst,
+          sampling = samp,
+          true.parameter = true.parameter[Model@parameter@all],
+          increment.L = t(increment.L))
+      }else{
+        simMod <- simulate(object = Model, hurst = hurst,
+          sampling = samp, xinit =xinit,
+          true.parameter = true.parameter[Model@parameter@all],
+          increment.L = t(increment.L))
+      }
+
+      colnames(simMod@data@original.data) <- Model@solve.variable
+
+      Data.tot <- as.matrix(simMod@data@original.data)
+
+      ExprHaz <- constHazIntPr(g.Fun = object@gFun@formula,
+        Kern.Fun = object@Kernel)$Intens
+
+      if(length(ExprHaz)==1){
+
+        Time <- samp@Initial
+
+        my.env <- new.env()
+        for(i in c(1:length(object@Ppr@allparam))){
+          assign(object@Ppr@allparam[i],
+            as.numeric(true.parameter[object@Ppr@allparam[i]]),
+            envir = my.env)
+        }
+
+
+
+        IntensityProc <- 0
+
+        cost <- runif(1)
+        while(-log(cost)<samp@delta)
+          {cost <- runif(1)}
+
+        posLeft <- 1
+        posRight <- samp@n+1
+
+        posMid <- floor((posLeft+posRight)/2)
+        solveLeft <- -log(cost)
+        solveRight <- NULL
+
+        exit <- FALSE
+        prova <- NULL
+
+        globEx <- FALSE
+
+        while(tail(Time,n=1L)<(samp@Terminal-samp@delta) && !globEx){
+          while(!exit){
+            if((posMid-posLeft)==1){
+              posMid
+            }
+            oldprova <- prova
+            prova <- SolvePpr(posMid, posLeft, posRight, solveLeft, solveRight,
+                              cost, Kern, simMod, samp, Model, ExprHaz,
+                               my.env, Time, IntensityProc)
+            if(length(prova$left)==0){
+              globEx <- TRUE
+            }else{
+            if(prova$left){
+              posMid <- floor((prova$posLeft+prova$posRight)/2)
+              posLeft <- prova$posLeft
+              posRight <- prova$posRight
+              solveRight <- prova$solveRight
+              solveLeft <- prova$solveLeft
+            }else{
+              posMid <- floor((prova$posLeft+prova$posRight)/2)
+              posLeft <- prova$posLeft
+              posRight <- prova$posRight
+              solveRight <- prova$solveRight
+              solveLeft <- prova$solveLeft
+            }
+             exit<-prova$exit
+          }
+              if(globEx){
+                exit <- TRUE
+                oldprova -> prova
+              }
+
+
+          }
+
+          cost <- runif(1)
+          while(-log(cost)<samp@delta)
+          {cost <- runif(1)}
+          exit<- FALSE
+          posRight <- samp@n+1
+          solveLeft <- -log(cost)
+           posMid <- floor((posLeft+posRight)/2)
+          # if(length(prova$VeryExit)!=0){
+          #   if(prova$VeryExit)
+          #     globEx <- TRUE
+          # }
+          if(!globEx)
+            Time <- prova$Time
+          IntensityProc <- prova$IntensityProc
+          #cat(tail(prova$Time,n=1L))
+          #cat(sprintf("\n%.5f ", posMid))
+          cat(sprintf("\n%.5f ", tail(Time,n=1L)))
+      }
+        cond <- samp@grid[[1]][-1] %in% Time[-1]
+        countVar <- Model@solve.variable %in%  object@Ppr@counting.var
+        increment.L[!cond, countVar]<-0
+        if(missing(xinit)){
+          simModNew <- simulate(object = Model, hurst = hurst,
+                             sampling = samp,
+                             true.parameter = true.parameter[Model@parameter@all],
+                             increment.L = t(increment.L))
+        }else{
+          simModNew <- simulate(object = Model, hurst = hurst,
+                             sampling = samp, xinit =xinit,
+                             true.parameter = true.parameter[Model@parameter@all],
+                             increment.L = t(increment.L))
+        }
+        object@data<-simModNew@data
+        return(object)
+
+      }else{
+
+      }
+    }
   }
   return(NULL)
 }
+
+SolvePpr <- function(posMid, posLeft, posRight, solveLeft = NULL, solveRight = NULL,
+                     cost, Kern, simMod, samp, Model, ExprHaz,
+                      my.env, Time, IntensityProc){
+
+  if((posMid+1)>=(samp@n+1)){
+    mylist <- list(VeryExit = TRUE)
+    return(mylist)
+  }
+  if((posMid+1)>=(samp@n+1)){
+    mylist <- list(VeryExit = TRUE)
+    return(mylist)
+  }
+
+
+   solveMid<- compErrHazR(posMid, simMod, Kern, samp, Model, my.env, ExprHaz, cost, Time)
+   if(solveMid$solveLambda <= 0){
+     # first check
+     if(solveMid$solveLambda<0 ){
+       if(posLeft == (posMid-1)){
+         if(solveLeft*solveMid$solveLambda<0){
+            mylist <- list()
+            mylist$exit <- TRUE
+            mylist$left <- TRUE
+            mylist$posLeft <- posMid
+            mylist$posRight <- samp@n+1
+            mylist$solveLeft <- solveMid$solveLambda
+            mylist$solveRight <- NULL
+            mylist$Time <- c(Time,samp@grid[[1]][-1][posMid])
+            mylist$IntensityProc <- c(IntensityProc, solveMid$dummyLambda)
+
+           return(mylist)
+         }
+       }
+     solveMidLeft <- compErrHazR(posMid-1, simMod, Kern, samp, Model, my.env, ExprHaz, cost, Time)
+      if(solveMidLeft$solveLambda >=0){
+        mylist <- list()
+        mylist$exit <- TRUE
+        mylist$left <- TRUE
+        mylist$posLeft <- posMid-1
+        mylist$posRight <- samp@n+1
+        mylist$solveLeft <- solveMidLeft$solveLambda
+        mylist$solveRight <- NULL
+        mylist$Time <- c(Time,samp@grid[[1]][-1][posMid-1])
+        mylist$IntensityProc <- c(IntensityProc, solveMidLeft$dummyLambda)
+        return(mylist)
+      }else{
+        mylist <- list()
+        mylist$exit <- FALSE
+        mylist$left <- TRUE
+        mylist$posLeft <- posLeft
+        mylist$posRight <- posMid
+        mylist$solveLeft <- solveLeft
+        mylist$solveRight <-solveMidLeft$solveLambda
+        mylist$Time <- Time
+        mylist$IntensityProc <- c(IntensityProc)
+        return(mylist)
+      }
+     }
+   }
+     if(solveMid$solveLambda==0){
+       mylist <- list()
+       mylist$exit <- TRUE
+       mylist$left <- FALSE
+       mylist$posLeft <-posMid
+       mylist$posRight <- samp@n+1
+       mylist$solveLeft <- solveMid$solveLambda
+       mylist$solveRight <- solveRight
+       mylist$Time <- c(Time,samp@grid[[1]][-1][posMid-1])
+       mylist$IntensityProc <- c(IntensityProc, solveMid$dummyLambda)
+       return(mylist)
+     }
+     if(solveMid$solveLambda > 0 && (posMid+1) <(samp@n+1)){
+       solveMidRight <- compErrHazR(posMid+1, simMod, Kern, samp, Model, my.env, ExprHaz, cost, Time)
+       if(solveMidRight$solveLambda <=0){
+         mylist <- list()
+         mylist$exit <- TRUE
+         mylist$left <- FALSE
+         mylist$posLeft <- posMid+1
+         mylist$posRight <- samp@n+1
+         mylist$solveLeft <-  solveMidRight$solveLambda
+         mylist$solveRight <- solveRight
+         mylist$Time <- c(Time,samp@grid[[1]][-1][posMid+1])
+         mylist$IntensityProc <- c(IntensityProc, solveMidRight$dummyLambda)
+         return(mylist)
+       }else{
+         mylist <- list()
+         mylist$exit <- FALSE
+         mylist$left <- FALSE
+         mylist$posLeft <- posMid+1
+         mylist$posRight <- posRight
+         mylist$solveLeft <- solveMidRight$solveLambda
+         mylist$solveRight <-solveRight
+         mylist$Time <- Time
+         mylist$IntensityProc <- c(IntensityProc)
+         return(mylist)
+       }
+      }
+}
+
+
+# SolvePpr <- function(TopposInGridIn, OldTimePoint, solveLambdaInOld,
+#                      cost, Kern, simMod, samp, Model, ExprHaz, dN,
+#                      LastTime, my.env, Time, IntensityProc, checkside = FALSE,
+#                      solveLeft=NULL, solveRight=NULL){
+#
+#   if(is.null(solveLambdaInOld)){
+#     solveLambdaOld <- -log(cost)
+#     solveLeft <- solveLambdaOld
+#     solveRight <- NULL
+#     dummyLambda <- numeric(length=(TopposInGridIn+1))
+#     if(length(Kern@variable.Integral@var.dx)==1){
+#       dN <- rep(0, (TopposInGridIn+1))
+#       #if(length(Time)==1){
+#         con <- (samp@grid[[1]] %in% Time)
+#         dN[c(FALSE, con)[c(1:length(dN))]] <- as.numeric(simMod@data@original.data[c(FALSE, con[-length(con)]),Kern@variable.Integral@var.dx]
+#                                          -simMod@data@original.data[con,Kern@variable.Integral@var.dx])
+#       #}
+#     }else{
+#
+#     }
+#     for(i in c(2:(TopposInGridIn+1))){
+#       posInGrid <- i
+#       LastTime <- samp@grid[[1]][(posInGrid)]
+#       LastStime <- samp@grid[[1]][c(1:(posInGrid-1))]
+#       assign(Model@time.variable, LastTime, envir = my.env)
+#       assign(Kern@variable.Integral@var.time, LastStime, envir = my.env)
+#       assign(paste0("d",Kern@variable.Integral@var.dx), dN[c(2:posInGrid)], envir =my.env)
+#       dummyLambda[i] <- eval(ExprHaz[[1]], envir=my.env)
+#     }
+#     solveLambdaOld00 <- -log(cost)-sum(dummyLambda[c(sum(samp@grid[[1]]<=tail(Time,n=1L)):(TopposInGridIn+1))])
+#     if(solveLambdaOld*solveLambdaOld00<0){
+#       TotposInGrid<-samp@n
+#       mylist <- list(InfTopposInGridInOld = min(TopposInGridIn,TotposInGrid),
+#                      supTopposInGridInOld = max(TopposInGridIn,TotposInGrid))
+#       if(mylist$InfTopposInGridInOld==TopposInGridIn){
+#         mylist$left <- TRUE
+#       }else{
+#         mylist$left <- FALSE
+#       }
+#       mylist$TotposInGrid <- TopposInGridIn+1
+#       mylist$OldSolveLambda <- solveLambdaOld00
+#       mylist$solveLeft <- solveLambdaOld00
+#       mylist$solveRight <- solveRight
+#       mylist$exit <- TRUE
+#       mylist$Time <- c(Time,samp@grid[[1]][-1][mylist$TotposInGrid])
+#       mylist$IntensityProc <- c(IntensityProc, tail(dummyLambda,n=1L))
+#       return(mylist)
+#     }
+#
+#   }else{
+#     if(TopposInGridIn>1){
+#       solveLambdaOld <- solveLambdaInOld
+#     }else{
+#
+#       dummyLambda <- numeric(length=(TopposInGridIn-1))
+#       if(length(Kern@variable.Integral@var.dx)==1){
+#         dN <- rep(0, (TopposInGridIn))
+#         dN[(TopposInGridIn)] <- as.numeric(simMod@data@original.data[TopposInGridIn,Kern@variable.Integral@var.dx]
+#                                            -simMod@data@original.data[TopposInGridIn-1,Kern@variable.Integral@var.dx])
+#       }else{
+#
+#       }
+#       for(i in c(2:(TopposInGridIn))){
+#         posInGrid <- i
+#         LastTime <- samp@grid[[1]][(posInGrid)]
+#         LastStime <- samp@grid[[1]][c(1:(posInGrid-1))]
+#         assign(Model@time.variable, LastTime, envir = my.env)
+#         assign(Kern@variable.Integral@var.time, LastStime, envir = my.env)
+#         assign(paste0("d",Kern@variable.Integral@var.dx), dN[c(1:posInGrid)], envir =my.env)
+#         dummyLambda[i] <- eval(ExprHaz[[1]], envir=my.env)
+#       }
+#
+#
+#       solveLambdaOld <- -log(cost)-sum(dummyLambda)
+#
+#     }
+#   }
+#
+#   TotposInGrid <- floor(abs((OldTimePoint)-TopposInGridIn)/2)+min(TopposInGridIn,(OldTimePoint))
+#
+#   cat(sprintf("\n%.5f ", TotposInGrid))
+#
+#
+#   dummyLambda <- numeric(length=(TotposInGrid-1))
+#   if(length(Kern@variable.Integral@var.dx)==1){
+#     dN <- rep(0, (TotposInGrid))
+#     con <- (samp@grid[[1]] %in% Time)
+#     con[TotposInGrid-1] <- TRUE
+#     dN[c(FALSE, con)[c(1:length(dN))]] <- as.numeric(simMod@data@original.data[c(FALSE, con[-length(con)]),Kern@variable.Integral@var.dx]
+#                                                      -simMod@data@original.data[con,Kern@variable.Integral@var.dx])
+#   }else{
+#
+#   }
+#   for(i in c(2:(TotposInGrid))){
+#     posInGrid <- i
+#     LastTime <- samp@grid[[1]][(posInGrid)]
+#     LastStime <- samp@grid[[1]][c(1:(posInGrid-1))]
+#     assign(Model@time.variable, LastTime, envir = my.env)
+#     assign(Kern@variable.Integral@var.time, LastStime, envir = my.env)
+#     assign(paste0("d",Kern@variable.Integral@var.dx), dN[c(2:posInGrid)], envir =my.env)
+#     dummyLambda[i] <- eval(ExprHaz[[1]], envir=my.env)
+#   }
+#
+#
+#   Solvelambda1 <- -log(cost)-sum(dummyLambda[c(sum(samp@grid[[1]]<=tail(Time,n=1L)):(TotposInGrid))])
+#   TotposInGridFin <- TotposInGrid
+#
+#   if(Solvelambda1*solveLambdaOld < 0 | Solvelambda1*solveLambdaOld > 0){
+#
+#       if(solveLeft*Solvelambda1>0){
+#         #solveLeft<-Solvelambda1
+#         TotposInGridFin <- TotposInGridFin+1
+#         dummyLambda <- numeric(length=(TotposInGridFin))
+#       }else{
+#         #solveRight <- Solvelambda1
+#         TotposInGridFin <- TotposInGridFin-1
+#         dummyLambda <- numeric(length=(TotposInGridFin-1))
+#       }
+#
+#     if(length(Kern@variable.Integral@var.dx)==1){
+#       dN <- rep(0, (TotposInGridFin))
+#       # dN[(TotposInGridFin)] <- as.numeric(simMod@data@original.data[TotposInGridFin,Kern@variable.Integral@var.dx]
+#       #                                     -simMod@data@original.data[TotposInGridFin-1,Kern@variable.Integral@var.dx])
+#       con <- (samp@grid[[1]] %in% Time)
+#       con[TotposInGridFin-1] <- TRUE
+#       dN[c(FALSE, con)[c(1:length(dN))]] <- as.numeric(simMod@data@original.data[c(FALSE, con[-length(con)]),Kern@variable.Integral@var.dx]
+#                                                        -simMod@data@original.data[con,Kern@variable.Integral@var.dx])
+#     }else{
+#
+#     }
+#     for(i in c(2:(TotposInGridFin))){
+#       posInGrid <- i
+#       LastTime <- samp@grid[[1]][(posInGrid)]
+#       LastStime <- samp@grid[[1]][c(1:(posInGrid-1))]
+#       assign(Model@time.variable, LastTime, envir = my.env)
+#       assign(Kern@variable.Integral@var.time, LastStime, envir = my.env)
+#       assign(paste0("d",Kern@variable.Integral@var.dx), dN[c(2:posInGrid)], envir =my.env)
+#       dummyLambda[i] <- eval(ExprHaz[[1]], envir=my.env)
+#     }
+#
+#
+#     Solvelambda2 <- -log(cost)-sum(dummyLambda[c(sum(samp@grid[[1]]<=tail(Time,n=1L)):(TotposInGridFin))])
+#     if(Solvelambda2*Solvelambda1<0){
+#       mylist <- list(InfTopposInGridInOld = min(TopposInGridIn,TotposInGridFin),
+#                      supTopposInGridInOld = max(TopposInGridIn,TotposInGridFin))
+#       if(mylist$InfTopposInGridInOld==TopposInGridIn){
+#         mylist$left <- TRUE
+#         mylist$solveLeft <- solveLeft
+#         mylist$solveRight <- Solvelambda2
+#       }else{
+#         mylist$left <- FALSE
+#         mylist$solveRight <- solveRight
+#         mylist$solveLeft <- Solvelambda2
+#       }
+#       #  TotposInGrid <- floor(abs(TotposInGrid-TopposInGridIn)/2)+min(TotposInGrid,TopposInGridIn)
+#
+#       mylist$TotposInGrid <- TotposInGridFin
+#       mylist$OldSolveLambda <- Solvelambda2
+#
+#       mylist$exit <- TRUE
+#      # mylist$Time <- c(Time,my.env$t)
+#       mylist$Time <- c(Time,samp@grid[[1]][-1][mylist$TotposInGrid])
+#       mylist$IntensityProc<- c(IntensityProc,tail(dummyLambda,n=1L))
+#       return(mylist)
+#     }else{
+#       mylist <- list(InfTopposInGridInOld = min(TopposInGridIn,TotposInGridFin),
+#                      supTopposInGridInOld = max(TopposInGridIn,TotposInGridFin))
+#
+#       if(solveLambdaOld>Solvelambda2){
+#           mylist$left <- TRUE
+#           mylist$solveLeft <- solveLeft
+#           mylist$solveRight <- Solvelambda2
+#         }else{
+#           mylist$left <- FALSE
+#           mylist$solveRight <- solveRight
+#           mylist$solveLeft <- Solvelambda2
+#         }
+#       }
+#       # if(solveLambdaOld>0){
+#       #   if(solveLambdaOld>Solvelambda2){
+#       #     mylist$left <- TRUE
+#       #   }else{
+#       #     TotposInGridFin <- TotposInGridFin-1
+#       #     dummyLambda <- numeric(length=(TotposInGridFin-1))
+#       #   }
+#       # }else{
+#       #   if(solveLambdaOld>Solvelambda1){
+#       #     TotposInGridFin <- TotposInGridFin+1
+#       #     dummyLambda <- numeric(length=(TotposInGridFin))
+#       #   }else{
+#       #     TotposInGridFin <- TotposInGridFin-1
+#       #     dummyLambda <- numeric(length=(TotposInGridFin-1))
+#       #   }
+#       # }
+#
+#     #  TotposInGrid <- floor(abs(TotposInGrid-TopposInGridIn)/2)+min(TotposInGrid,TopposInGridIn)
+#
+#       mylist$TotposInGrid <- TotposInGridFin
+#       mylist$OldSolveLambda <- Solvelambda2
+#       mylist$exit <- FALSE
+#       mylist$Time <- Time
+#       mylist$IntensityProc <- IntensityProc
+#       return(mylist)
+#       #repeat
+#     }
+#
+#   if(Solvelambda1 == 0){
+#     mylist <- list(InfTopposInGridInOld = min(TopposInGridIn,TotposInGridFin),
+#                    supTopposInGridInOld = max(TopposInGridIn,TotposInGridFin))
+#     if(solveLambdaOld>=Solvelambda1){
+#       mylist$left <- TRUE
+#       mylist$solveLeft <- solveLeft
+#       mylist$solveRight <- Solvelambda1
+#     }else{
+#       mylist$left <- FALSE
+#       mylist$solveRight <- solveRight
+#       mylist$solveLeft <- Solvelambda1
+#     }
+#     #  TotposInGrid <- floor(abs(TotposInGrid-TopposInGridIn)/2)+min(TotposInGrid,TopposInGridIn)
+#
+#     mylist$TotposInGrid <- TotposInGridFin
+#     mylist$OldSolveLambda <- Solvelambda2
+#     mylist$exit <- TRUE
+#   #  mylist$Time <- c(Time,my.env$t)
+#     mylist$Time <- c(Time,samp@grid[[1]][-1][mylist$TotposInGrid])
+#     mylist$IntensityProc<- c(IntensityProc,tail(dummyLambda,n=1L))
+#     return(mylist)
+#   }
+# }
+
+compErrHazR <- function(TopposInGrid, simMod, Kern,
+                        samp, Model, my.env, ExprHaz,
+                        cost, Time){
+  dummyLambda <- numeric(length=(TopposInGrid))
+  if(length(Kern@variable.Integral@var.dx)==1){
+    dN <- rep(0, TopposInGrid)
+
+    con <- (samp@grid[[1]] %in% c(Time[-1],samp@grid[[1]][TopposInGrid]))
+    dN[con[c(1:length(dN))]] <- as.numeric(simMod@data@original.data[c(FALSE, con[-length(con)]),Kern@variable.Integral@var.dx]
+                                                     -simMod@data@original.data[con,Kern@variable.Integral@var.dx])
+  }else{}
+  #for(i in c(1:TopposInGrid)){
+  #MyPos
+  MyPos <- sum(samp@grid[[1]]<=tail(Time,n=1L))
+  #dummyLambda <- numeric(length=TopposInGrid)
+  assign(Kern@variable.Integral@var.time, Time, envir = my.env)
+  for(i in c(MyPos:TopposInGrid)){
+    posInGrid <- i
+    LastTime <- samp@grid[[1]][-1][(posInGrid)]
+    #LastStime <- samp@grid[[1]][c(1:posInGrid)]
+    assign(Model@time.variable, LastTime, envir = my.env)
+    #assign(Kern@variable.Integral@var.time, LastStime, envir = my.env)
+    #assign(paste0("d",Kern@variable.Integral@var.dx), dN[c(1:posInGrid)], envir =my.env)
+    assign(paste0("d",Kern@variable.Integral@var.dx), 1, envir =my.env)
+    dummyLambda[i] <- eval(ExprHaz[[1]], envir=my.env)
+  }
+ # solveLambda <- -log(cost)-sum(dummyLambda[c(sum(samp@grid[[1]]<=tail(Time,n=1L)):(TopposInGrid))])*samp@delta
+  solveLambda <- -log(cost)-sum(dummyLambda[c(MyPos:(TopposInGrid))])*samp@delta
+  res <- list(solveLambda = solveLambda, dummyLambda = tail(dummyLambda,n=1L))
+  return(res)
+}
+
+
 
 
 aux.simulatPprROldVersion <- function(object, nsim = nsim, seed = seed,
