@@ -1,7 +1,7 @@
 Package: yuima
 Type: Package
 Title: The YUIMA Project Package for SDEs
-Version: 1.5.9
+Version: 1.6.4
 Depends: R(>= 2.10.0), methods, zoo, stats4, utils, expm, cubature,
         mvtnorm
 Imports: Rcpp (>= 0.12.1)
@@ -10,8 +10,8 @@ Maintainer: Stefano M. Iacus <stefano.iacus@unimi.it>
 Description: Simulation and Inference for SDEs and Other Stochastic Processes.
 License: GPL-2
 URL: http://www.yuima-project.com
-LinkingTo: Rcpp
+LinkingTo: Rcpp, RcppArmadillo
 NeedsCompilation: yes
-Packaged: 2017-02-16 08:13:22 UTC; jago
+Packaged: 2017-04-29 16:35:21 UTC; jago
 Repository: CRAN
-Date/Publication: 2017-02-16 10:56:19
+Date/Publication: 2017-04-29 17:22:22 UTC

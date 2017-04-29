@@ -17,8 +17,9 @@ importFrom("utils", "relist")
 
 #08/07/2016
 #exportPattern("^[[:alpha:]]+") # NEVER DO THIS AGAIN PLEASE!
+#cimport(RcppArmadillo)
 importFrom(Rcpp, evalCpp)
-
+#import(RcppArmadillo)
 # 03/07/2015
 importFrom(stats, time)
 importFrom(stats, ts)
@@ -199,6 +200,9 @@ export(lasso)
 export(CPoint)
 export(qmleR)
 export(qmleL)
+export(qmleLevy)
+export(IC)
+
 
 export(Intensity.PPR)
 
@@ -240,6 +244,7 @@ S3method(rbind, yuima.model)
 S3method(plot, yuima.llag) # Oct. 10, 2015
 S3method(plot, yuima.mllag) # Oct. 10, 2015
 
-useDynLib(yuima)
+useDynLib(yuima) #,.registration = TRUE)
+
 
 

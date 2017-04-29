@@ -55,7 +55,9 @@ euler<-function(xinit,yuima,dW,env){
 ##:: set time step
 	# delta <- Terminal/n
 	delta <- yuima@sampling@delta
-
+	
+	## moving the following lines enclosed if(0) after Levy (YK, Apr 12, 2017)
+	if(0){
 ##:: check if DRIFT and/or DIFFUSION has values
 	has.drift <- sum(as.character(sdeModel@drift) != "(0)")
 	var.in.diff <- is.logical(any(match(unlist(lapply(sdeModel@diffusion, all.vars)), sdeModel@state.variable)))
@@ -93,11 +95,11 @@ euler<-function(xinit,yuima,dW,env){
 
   X_mat <- matrix(0, d.size, n+1)
   X_mat[,1] <- dX
-
+  
 	if(has.drift){  ##:: consider drift term to be one of the diffusion term(dW=1)
 		dW <- rbind( rep(1, n)*delta , dW)
 	}
-
+	}## if(0) finish
 
   if(!length(sdeModel@measure.type)){ ##:: Wiener Proc
     ##:: using Euler-Maruyama method
@@ -107,7 +109,8 @@ euler<-function(xinit,yuima,dW,env){
         ##:: calcurate difference eq.
         for( i in 1:n){
           # dX <- dX + p.b(t=i*delta, X=dX) %*% dW[, i]
-          dX <- dX + p.b(t=yuima@sampling@Initial+i*delta, X=dX) %*% dW[, i] # LM
+          #dX <- dX + p.b(t=yuima@sampling@Initial+i*delta, X=dX) %*% dW[, i] # LM
+          dX <- dX + p.b(t=yuima@sampling@Initial+(i-1)*delta, X=dX) %*% dW[, i] # YK
           X_mat[,i+1] <- dX
         }
       }else{  ##:: diffusions have no state variables (not use p.b(). faster)
@@ -156,6 +159,7 @@ euler<-function(xinit,yuima,dW,env){
       }
     }
     
+    #if(0){ # currently ignored due to a bug (YK, Feb 23, 2017)
     # new version (Jan 25, 2017)
     b <- parse(text=paste("c(",paste(as.character(V0),collapse=","),")"))
     vecV <- parse(text=paste("c(",paste(as.character(unlist(V)),collapse=","),")"))
@@ -163,10 +167,53 @@ euler<-function(xinit,yuima,dW,env){
     X_mat <- .Call("euler", dX, Initial, as.integer(r.size), 
                    rep(1, n) * delta, dW, modeltime, modelstate, quote(eval(b, env)), 
                    quote(eval(vecV, env)), env, new.env())
-    
+    #}
     #tsX <- ts(data=t(X_mat), deltat=delta , start=0)
     tsX <- ts(data=t(X_mat), deltat=delta , start = yuima@sampling@Initial) #LM
   }else{ ##:: Levy
+    ### add (YK, Apr 12, 2017)
+    ##:: check if DRIFT and/or DIFFUSION has values
+    has.drift <- sum(as.character(sdeModel@drift) != "(0)")
+    var.in.diff <- is.logical(any(match(unlist(lapply(sdeModel@diffusion, all.vars)), sdeModel@state.variable)))
+    #print(is.Poisson(sdeModel))
+    
+    ##:: function to calculate coefficients of dW(including drift term)
+    ##:: common used in Wiener and CP
+    p.b <- function(t, X=numeric(d.size)){
+      ##:: assign names of variables
+      for(i in 1:length(modelstate)){
+        assign(modelstate[i], X[i], env)
+      }
+      assign(modeltime, t, env)
+      ##:: solve diffusion term
+      if(has.drift){
+        tmp <- matrix(0, d.size, r.size+1)
+        for(i in 1:d.size){
+          tmp[i,1] <- eval(V0[i], env)
+          for(j in 1:r.size){
+            tmp[i,j+1] <- eval(V[[i]][j],env)
+          }
+        }
+      } else {  ##:: no drift term (faster)
+        tmp <- matrix(0, d.size, r.size)
+        if(!is.Poisson(sdeModel)){ # we do not need to evaluate diffusion
+          for(i in 1:d.size){
+            for(j in 1:r.size){
+              tmp[i,j] <- eval(V[[i]][j],env)
+            } # for j
+          } # foh i
+        } # !is.Poisson
+      } # else
+      return(tmp)
+    }
+    
+    X_mat <- matrix(0, d.size, n+1)
+    X_mat[,1] <- dX
+    
+    if(has.drift){  ##:: consider drift term to be one of the diffusion term(dW=1)
+      dW <- rbind( rep(1, n)*delta , dW)
+    }
+    
     JP <- sdeModel@jump.coeff
     mu.size <- length(JP)
     # cat("\n Levy\n")
@@ -286,15 +333,18 @@ euler<-function(xinit,yuima,dW,env){
             }
 
             # Pi <- p.b.j(t=i*delta,X=dX) * J #LM
-            Pi <- p.b.j(t=yuima@sampling@Initial+i*delta,X=dX) * J
+            #Pi <- p.b.j(t=yuima@sampling@Initial+i*delta,X=dX) * J
+            Pi <- p.b.j(t=yuima@sampling@Initial+(i-1)*delta,X=dX) * J # YK
           }else{# we add this part since we allow the user to specify the increment of CP LM 05/02/2015
           #  Pi <- p.b.j(t=i*delta,X=dX) %*% dL[, i] #LM
-            Pi <- p.b.j(t=yuima@sampling@Initial+i*delta,X=dX) %*% dL[, i]
+            #Pi <- p.b.j(t=yuima@sampling@Initial+i*delta,X=dX) %*% dL[, i]
+            Pi <- p.b.j(t=yuima@sampling@Initial+(i - 1)*delta,X=dX) %*% dL[, i] # YK
           }
           ##Pi <- p.b.j(t=i*delta, X=dX)
         }
         # dX <- dX + p.b(t=i*delta, X=dX) %*% dW[, i] + Pi # LM
-        dX <- dX + p.b(t=yuima@sampling@Initial + i*delta, X=dX) %*% dW[, i] + Pi
+        #dX <- dX + p.b(t=yuima@sampling@Initial + i*delta, X=dX) %*% dW[, i] + Pi
+        dX <- dX + p.b(t=yuima@sampling@Initial + (i - 1)*delta, X=dX) %*% dW[, i] + Pi # YK
         X_mat[, i+1] <- dX
       }
       # tsX <- ts(data=t(X_mat), deltat=delta, start=0) #LM
@@ -357,7 +407,8 @@ euler<-function(xinit,yuima,dW,env){
         }
         #           cat("\np.b.j call\n")
             # tmp.j <- p.b.j(t=i*delta, X=dX) #LM
-            tmp.j <- p.b.j(t=yuima@sampling@Initial+i*delta, X=dX)
+            #tmp.j <- p.b.j(t=yuima@sampling@Initial+i*delta, X=dX)
+            tmp.j <- p.b.j(t=yuima@sampling@Initial+(i - 1)*delta, X=dX) # YK
             #print(str(tmp.j))
             #cat("\np.b.j cback and dZ\n")
             # print(str(dZ[,i]))
@@ -367,7 +418,8 @@ euler<-function(xinit,yuima,dW,env){
          #print(str(tmp.j))
          #print(str(p.b(t = i * delta, X = dX) %*% dW[, i]))
         # dX <- dX + p.b(t=i*delta, X=dX) %*% dW[, i] +tmp.j %*% dZ[,i] #LM
-          dX <- dX + p.b(t=yuima@sampling@Initial+i*delta, X=dX) %*% dW[, i] +tmp.j %*% dZ[,i]
+          #dX <- dX + p.b(t=yuima@sampling@Initial+i*delta, X=dX) %*% dW[, i] +tmp.j %*% dZ[,i]
+          dX <- dX + p.b(t=yuima@sampling@Initial+(i - 1)*delta, X=dX) %*% dW[, i] +tmp.j %*% dZ[,i] # YK
         X_mat[, i+1] <- dX
       }
       # tsX <- ts(data=t(X_mat), deltat=delta, start=0) #LM

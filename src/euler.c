@@ -17,6 +17,7 @@ SEXP euler(SEXP x0, SEXP t0, SEXP R, SEXP dt, SEXP dW, SEXP modeltime, SEXP mode
     int i, j, k, n, d, r;
     double *rdt, *rdW, *rX, *rx0, *b, *sigma;
     SEXP X, xpar, tpar;
+    //SEXP X, xpar, tpar, xvar, tvar;
     
     PROTECT(x0 = AS_NUMERIC(x0));
     rx0 = REAL(x0);
@@ -41,7 +42,7 @@ SEXP euler(SEXP x0, SEXP t0, SEXP R, SEXP dt, SEXP dW, SEXP modeltime, SEXP mode
     }
     
     PROTECT(tpar = allocVector(REALSXP, 1));
-    PROTECT(xpar = allocVector(REALSXP, 1));
+    //PROTECT(xpar = allocVector(REALSXP, 1));
     
     PROTECT(t0 = AS_NUMERIC(t0));
     REAL(tpar)[0] = REAL(t0)[0]; /* initial time */
@@ -49,13 +50,18 @@ SEXP euler(SEXP x0, SEXP t0, SEXP R, SEXP dt, SEXP dW, SEXP modeltime, SEXP mode
     for (i = 0; i < n; i++) {
         
         /* assign the current variables */
-        defineVar(installChar(STRING_ELT(modeltime, 0)), tpar, env);
+        defineVar(installChar(STRING_ELT(modeltime, 0)), tpar, env); 
+        // PROTECT(tvar = STRING_ELT(modeltime, 0));
+        //defineVar(installChar(tvar), tpar, env); 
         
         for (j = 0; j < d; j++) {
-            /*xpar = allocVector(REALSXP, 1);*/
+            PROTECT(xpar = allocVector(REALSXP, 1));
             REAL(xpar)[0] = rX[j + i * d];
-            defineVar(installChar(STRING_ELT(modelstate, j)), duplicate(xpar), env);
-            /*defineVar(installChar(STRING_ELT(modelstate, j)), xpar, env);*/
+            //defineVar(installChar(STRING_ELT(modelstate, j)), duplicate(xpar), env);
+            //PROTECT(xvar = STRING_ELT(modelstate, j));
+            //defineVar(installChar(xvar), duplicate(xpar), env);
+            defineVar(installChar(STRING_ELT(modelstate, j)), xpar, env);
+            UNPROTECT(1);
         }
         
         /*defineVar(install("env"), env, rho);*/
@@ -78,6 +84,6 @@ SEXP euler(SEXP x0, SEXP t0, SEXP R, SEXP dt, SEXP dW, SEXP modeltime, SEXP mode
         REAL(tpar)[0] += rdt[i];
     }
     
-    UNPROTECT(7);
+    UNPROTECT(6);
     return(X);
 }

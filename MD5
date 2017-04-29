@@ -1,7 +1,7 @@
 94d55d512a9ba36caa9b7df079bae19f *COPYING
-e28fbc668d8593e561e42567310b1c02 *DESCRIPTION
-78555ea59ce1b92bdac35fbc65bd1644 *NAMESPACE
-7e736091160e525dc7409179a5a423b3 *NEWS
+6ff6771b74704fbc1dbc18609adcde46 *DESCRIPTION
+f290fae7e2189d079adc58b354583335 *NAMESPACE
+52d732c1f3eca935acf88ec0f5995de6 *NEWS
 778e4b1f228bb32472ce4604c098b304 *R/AllClasses.R
 eee3644e6d8be56074eb21822d3210f8 *R/AuxMethodforPPR.R
 96f6fe0474453484c238f0970e8038b3 *R/CPoint.R
@@ -11,11 +11,12 @@ dd610167315ee57f6b5921a5da017867 *R/CarmaNoise.R
 6176779119bb0e1a7260ead2443e9dff *R/DiagnosticCarma.R
 2e0bac6f55b108d4008cea8270d6d68f *R/DiagnosticCogarch.R
 01a3e835c0cfd35dce4d34d6763b5fa8 *R/FunctionAndOperators.R
+710e193dcd36ab4085d2b3791424c34b *R/IC.R
 9f604491f19766f60c180f2dacb746b6 *R/MM.COGARCH.R
 6572d692fccc1407df5b668b5bf583a8 *R/MethodForLaw.R
 c0d1c8b86b588b042c4c112a9aa239ca *R/NewClasses.R
 83d94c78f7c73bc1a3afef43130179b0 *R/PointProcessClasses.R
-03e030f1075484e5246b1b4fbba5831e *R/PseudoLogLikCOGARCH.R
+ee7171a81ca0402397480d118eeace23 *R/PseudoLogLikCOGARCH.R
 2769a941be91fee725f0ab579925eb4a *R/RcppExports.R
 732dcc9e15b9c0a4ce729a7825c4f3cf *R/WoodChanfGn.R
 ac2ace50f9d723532f8e95b44f62fd8c *R/adaBayes.R
@@ -24,7 +25,7 @@ ce7188b6122aed3cc988f68aa4425098 *R/asymptotic_term_third.R
 c84cc727acac73a45493ff22b55a78a4 *R/asymptotic_term_third_function.R
 3878b53ad6b45165671e6992e19bcced *R/bns.test.R
 cdaae861c947a38f8189cfc12d18c5db *R/cce.R
-062cfafa31f5862ca35e7866e1c88254 *R/cogarchNoise.R
+c7a3bb80e0a4c609c1b096fd4b067eed *R/cogarchNoise.R
 81109b8c6aa4eed3435772af607b114e *R/hyavar.R
 b08e054f9de744817c7e310b6d4df4a4 *R/lambdaPPR.R
 febfb56c6f3c5e1d41854337c9ec5e00 *R/lasso.R
@@ -40,6 +41,7 @@ e920d4330c561d82faa6695675da2d3b *R/phi.test.R
 197ae3a057ce2b8309af7c30a30f3337 *R/poisson.random.sampling.R
 dccb8679a411fb8e915736c8510f710e *R/qgv.R
 4220357495c23d10e716bf6e0999b7fb *R/qmle.R
+55fbbcc961ed77a544a4fe0ae02f7c0c *R/qmleLevy.R
 7658b39c1b3cedd74ad3e11b558edd71 *R/rng.R
 1f567847cf9c65fa085f2f9a50d3e8e6 *R/sampling2grid.R
 738c1edcc284afdb385274d952665fbf *R/setCarma.R
@@ -48,7 +50,7 @@ dccb8679a411fb8e915736c8510f710e *R/qgv.R
 4b8647a2c018ae59b0a464f031e7c8b2 *R/setMultiModel.R
 fcecca27a76849cd88191dfa8599b2b6 *R/setPoisson.R
 f73eb5a08ae59d0f87a1248030d7b099 *R/setPpr.R
-337c910cd0f8ef9c53b543f3a3ebdfa5 *R/sim.euler.R
+de57a59b21c7db830040d91722bd3206 *R/sim.euler.R
 d6d8dbbbeb5b8950787d890e953d38ed *R/sim.euler.space.discretized.R
 357799e4682e2422e3373bb4390ff035 *R/simCP.R
 8085cc8546d7bc91626fbf170354256e *R/simFunctional.R
@@ -83,6 +85,7 @@ b8ef9ee6ce88d58b1a10067e58f3d277 *inst/ybook/chapter5.R
 2ff567959c3646587b4eea7855f3fd40 *man/CarmaNoise.Rd
 7d14ee06f14e3f17a0b0f338d58840e5 *man/Diagnostic.Carma.Rd
 36a70b3f4695317597d6e0a5ead614f9 *man/Diagnostic.Cogarch.Rd
+7efca8f83dbda1691d7d6197bb9468d8 *man/IC.Rd
 373a5beea48671dc52cc980da3c9f39f *man/Integral.sde.rd
 8b6a11819c8fd0ba2551e37e69ab7a66 *man/Integrand.rd
 764949aab3e1513b7108fa9413fb8937 *man/Intensity.PPR.Rd
@@ -118,6 +121,7 @@ db5127cc4b6ee0cd2ab9f40e52341477 *man/mpv.Rd
 7566b9ac61bee8350513827f37448cb7 *man/poisson.random.sampling.Rd
 b3165cb5569c8200e1951475a788de29 *man/qgv.Rd
 9511ad690c71917c7fbf7049596de694 *man/qmle.Rd
+c5734b1c0120ebc880ae465863265e12 *man/qmleLevy.Rd
 361abb4eb2b5e1fac3c9513b27e7623e *man/rconst.Rd
 386e6bbfb1e1bf243594546a42d7cd41 *man/rng.Rd
 dcf545cfcafb3d4db450cb64d0ee46ad *man/setCarma.Rd
@@ -158,13 +162,17 @@ d8c0fc095d6a7d24a6a5cfd9c2e38586 *man/yuima.model-class.Rd
 6a72501f7453e18ee6987dede63ffe53 *man/yuima.multimodel.Rd
 068fee21cdb050ca6f46be8739cc25b7 *man/yuima.poisson-class.Rd
 ffbff0dc3f384712fe20d939c8c9bd84 *man/yuima.sampling-class.Rd
+2a6f9e9e044a78154d3cfda5936d6f48 *src/Makevars
+8d46d69896a1f1d31ed76035a0e49d67 *src/Makevars.win
 4029dd40a1d3e9acca6da00af9d351f5 *src/MpCN.cpp
 2b1a38d3f511eca643f8bb068606f767 *src/Mt.h
-e33f564d55ac991fbd073d0a9da4a5b2 *src/PseudoLoglikCOGARCH.c
+d526b452d20f043cf4f3e85be8345a32 *src/PseudoLoglikCOGARCH.c
 12a71e207c71fa492b51fd16381a427f *src/RcppExports.cpp
 9bf5144dbaa6f7c01b99307463cdee07 *src/carmafilter.c
 35dad51d480042ba175c1461f7c44f84 *src/cce_functions.c
-29c7df46a58ed220949e409258657b83 *src/euler.c
+9a0949594da84284dc11344b72c63950 *src/euler.c
 4c06820c7b26b2f4dae030676c8343f1 *src/minusquasilogl_W1andW2.cpp
+fee76cbf3ef99e0b1108c34f536ae0a8 *src/pseudoLogLikCogarchIrregularGrid.cpp
 e6bb05e4b4e54b75f046f52469949dd0 *src/qmlecpp.cpp
 e07e760a18ac1c05273de1e2aac2b51d *src/rng.c
+d60b70b60187234e36718ed54803f109 *src/yuima_init.c
