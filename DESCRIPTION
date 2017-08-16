@@ -1,7 +1,7 @@
 Package: yuima
 Type: Package
 Title: The YUIMA Project Package for SDEs
-Version: 1.6.4
+Version: 1.6.8
 Depends: R(>= 2.10.0), methods, zoo, stats4, utils, expm, cubature,
         mvtnorm
 Imports: Rcpp (>= 0.12.1)
@@ -12,6 +12,6 @@ License: GPL-2
 URL: http://www.yuima-project.com
 LinkingTo: Rcpp, RcppArmadillo
 NeedsCompilation: yes
-Packaged: 2017-04-29 16:35:21 UTC; jago
+Packaged: 2017-08-11 22:06:38 UTC; jago
 Repository: CRAN
-Date/Publication: 2017-04-29 17:22:22 UTC
+Date/Publication: 2017-08-16 08:20:11 UTC

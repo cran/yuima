@@ -356,8 +356,8 @@ qmle <- function(yuima, start, method="BFGS", fixed = list(), print=FALSE,
 
 
   fixed.par <- names(fixed) # We use Fixed.par when we consider a Carma with scale parameter
+  fixed.carma=NULL
   if(is.CARMA(yuima) && (length(measure.par)>0)){
-    fixed.carma=NULL
     if(!missing(fixed)){
       if(names(fixed) %in% measure.par){
         idx.fixed.carma<-match(names(fixed),measure.par)
@@ -425,8 +425,12 @@ qmle <- function(yuima, start, method="BFGS", fixed = list(), print=FALSE,
     idx.xinit <- as.integer(na.omit(match(xinit.par,nm)))# We need to add idx if NoNeg.Noise is TRUE
     #}
   }
-
-  idx.fixed <- match(fixed.par, nm)
+  #if(is.null(fixed.carma)){
+    idx.fixed <- match(fixed.par, nm)
+#  }else{
+  #   dummynm <- nm[!(nm %in% fixed.par)]
+  #   idx.fixed <- match(fixed.par, dummynm)
+  # }
   orig.idx.fixed <- idx.fixed
 
   tmplower <- as.list( rep( -Inf, length(nm)))
@@ -596,6 +600,9 @@ qmle <- function(yuima, start, method="BFGS", fixed = list(), print=FALSE,
           if(mean.noise %in% names(lower)){lower[mean.noise]<-10^-7}
         oout <- optim(new.start, fj, method = method, hessian = TRUE, lower=lower, upper=upper)
 
+        if(length(fixed)>0)
+          oout$par[fixed.par]<- unlist(fixed)[fixed.par]
+
         if(is.CARMA(yuima)){
           HESS <- oout$hessian
         } else {
@@ -609,6 +616,26 @@ qmle <- function(yuima, start, method="BFGS", fixed = list(), print=FALSE,
           HESS<-HESS[-idx.b0,]
           HESS<-HESS[,-idx.b0]
         }
+        # if(is.CARMA(yuima) && length(yuima@model@parameter@measure)!=0){
+        #   for(i in c(1:length(fixed.par))){
+        #     indx.fixed<-match(fixed.par[i],rownames(HESS))
+        #     HESS<-HESS[-indx.fixed,]
+        #     HESS<-HESS[,-indx.fixed]
+        #   }
+        #   if(is.CARMA(yuima) && (NoNeg.Noise==TRUE)){
+        #     idx.noise<-(match(mean.noise,rownames(HESS)))
+        #     HESS<-HESS[-idx.noise,]
+        #     HESS<-HESS[,-idx.noise]
+        #   }
+        # }
+        if(is.CARMA(yuima)&& length(fixed)>0 && length(yuima@model@parameter@measure)==0){
+          for(i in c(1:length(fixed.par))){
+            indx.fixed<-match(fixed.par[i],rownames(HESS))
+            HESS<-HESS[-indx.fixed,]
+            HESS<-HESS[,-indx.fixed]
+          }
+        }
+
         if(is.CARMA(yuima) && length(yuima@model@parameter@measure)!=0){
           for(i in c(1:length(fixed.par))){
             indx.fixed<-match(fixed.par[i],rownames(HESS))
@@ -621,6 +648,8 @@ qmle <- function(yuima, start, method="BFGS", fixed = list(), print=FALSE,
             HESS<-HESS[,-idx.noise]
           }
         }
+
+
         HaveDriftHess <- TRUE
         HaveDiffHess <- TRUE
       } else { ### one dimensional optim
@@ -2997,16 +3026,16 @@ yuima.Estimation.Lev<-function(Increment.lev,param0,
 
   env$aggregation<-aggregation
   if(is.na(paramLev[1])){
-    covLev<-matrix(NA,length(paramLev),length(paramLev))
+    covLev<-matrix(0,length(paramLev),length(paramLev))
   }else{
     covLev<-Lev.hessian(params=paramLev,env)
     rownames(covLev)<-names(paramLev)
     if(!is.null(fixed.carma)){
-      covLev[names.fixed,]<-matrix(NA,numb.fixed,lengpar)
+      covLev[names.fixed,]<-matrix(0,numb.fixed,lengpar)
     }
     colnames(covLev)<-names(paramLev)
     if(!is.null(fixed.carma)){
-      covLev[,names.fixed]<-matrix(NA,lengpar,numb.fixed)
+      covLev[,names.fixed]<-matrix(0,lengpar,numb.fixed)
     }
   }
   if(aggregation==FALSE){
