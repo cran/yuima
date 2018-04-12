@@ -15,6 +15,7 @@ importFrom("graphics", "lines")
 importFrom("stats", "qchisq")
 importFrom("utils", "relist")
 
+importFrom(boot, boot) # added by YK on Sep. 9, 2017 
 #08/07/2016
 #exportPattern("^[[:alpha:]]+") # NEVER DO THIS AGAIN PLEASE!
 #cimport(RcppArmadillo)
@@ -60,6 +61,7 @@ importFrom(stats, end)
 importFrom(stats, start)
 importFrom(utils, str)
 importFrom(stats, sd)
+importFrom("stats", cov2cor) # added by YK on Apr. 12, 2018
 
 
 exportClasses("yuima",
@@ -166,6 +168,7 @@ export(bns.test)
 export(hyavar) # asymptotic variance estimator for the Hayashi-Yoshida estimator
 export(lmm) # Oct. 10, 2015: local methods of moment estimator
 export(mllag) # Oct. 10, 2015: multiple lead-lag detector
+export(llag.test) # Sep. 9, 2017: testing the absence of lead-lag effects 
 
 export(get.zoo.data)
 
@@ -194,6 +197,7 @@ export(asymptotic_term)
 export(lse)
 
 export(qmle)
+export(get.counting.data)
 export(quasilogl)
 export(phi.test)
 export(lasso)
@@ -202,6 +206,7 @@ export(qmleR)
 export(qmleL)
 export(qmleLevy)
 export(IC)
+export(DataPpr)
 
 
 export(Intensity.PPR)
@@ -244,8 +249,6 @@ S3method(cbind, yuima)
 
 S3method(plot, yuima.llag) # Oct. 10, 2015
 S3method(plot, yuima.mllag) # Oct. 10, 2015
-
-useDynLib(yuima) #,.registration = TRUE)
-
+useDynLib(yuima)
 
 

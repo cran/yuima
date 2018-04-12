@@ -134,7 +134,9 @@ a numeric vector or list indicating the threshold parameter(s). Each of its comp
 }
   \item{utime}{
 %%     ~~Describe \code{utime} here~~
-a positive number indicating what seconds the number ``1'' corresponds to. The default value is 23400 (this means 6.5 hours) if the time indices of the (first component) of \code{x} is numeric, otherwise 1.
+a positive number indicating what seconds the interval [0,1] corresponds to. 
+%The default value is 23400 (this means 6.5 hours) if the time indices of the (first component) of \code{x} is numeric, otherwise 1.
+The default value is the difference between the maximum and the minimum of the sampling times, multiplied by 23,400. Here, 23,400 seconds correspond to 6.5 hours, hence if the data is sampled on the interval [0,1], then the sampling interval is regarded as 6.5 hours. 
 }
 \item{psd}{
 logical. If \code{TRUE}, the estimated covariance matrix \code{C} is converted to \code{(C\%*\%C)^(1/2)} for ensuring the positive semi-definiteness. In this case the absolute values of the estimated correlations are always ensured to be less than or equal to 1. 
@@ -264,9 +266,9 @@ Hayashi, T. and Yoshida, N. (2008)
   Asymptotic normality of a covariance estimator for nonsynchronously observed diffusion processes, 
   \emph{Annals of the Institute of Statistical Mathematics}, \bold{60}, no. 2, 367--406.
 
-Koike, Y. (2015)
+Koike, Y. (2016)
   Estimation of integrated covariances in the simultaneous presence of nonsynchronicity, microstructure noise and jumps,
-  \emph{Econometric Theory}, doi:10.1017/S0266466614000954.
+  \emph{Econometric Theory}, \bold{32}, 533--611.
   
 Koike, Y. (2014)
   An estimator for the cumulative co-volatility of asynchronously observed semimartingales with jumps,
@@ -280,9 +282,9 @@ Mancini, C. and Gobbi, F. (2012)
   Identifying the Brownian covariation from the co-jumps given discrete observations,
   \emph{Econometric Theory}, \bold{28}, 249--273.
   
-Varneskov, R. T. (2015)
+Varneskov, R. T. (2016)
   Flat-top realized kernel estimation of quadratic covariation with non-synchronous and noisy asset prices,
-  \emph{Journal of Business & Economic Statistics}, doi:10.1080/07350015.2015.1005622.
+  \emph{Journal of Business & Economic Statistics}, \bold{34}, no.1, 1--22.
   
 Zhang, L. (2006)
   Efficient estimation of stochastic volatility using noisy observations: a multi-scale approach,

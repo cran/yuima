@@ -12,18 +12,36 @@ Internal.LogLikPPR <- function(param,my.envd1=NULL,
   # IntLambda<-InternalConstractionIntensity(param,my.envd1,
   #                                          my.envd2,my.envd3)
   Index<-my.envd3$gridTime
-  Integr1 <- -sum(IntLambda[-length(IntLambda)]*diff(Index),na.rm=TRUE)
+  Integr1a <- -sum(IntLambda[-length(IntLambda)]*diff(Index),na.rm=TRUE)
+  Integr1b <- -sum(IntLambda[-1]*diff(Index),na.rm=TRUE)
+  Integr1 <- (Integr1a+Integr1b)/2
   # if(is.nan(Integr1)){
   #   Integr1 <- -10^6
   # }
-  cond2 <- diff(as.numeric(my.envd3$YUIMA.PPR@data@original.data))
-  Integr2<- sum(log(IntLambda[-1][cond2>0]),na.rm=TRUE)
+  if(length(my.envd3$YUIMA.PPR@Ppr@counting.var)>0){
+    cond1 <- my.envd3$YUIMA.PPR@model@solve.variable %in% my.envd3$YUIMA.PPR@Ppr@counting.var
+    cond2 <- diff(as.numeric(my.envd3$YUIMA.PPR@data@original.data[,cond1]))
+    #Integr2<- sum(log(IntLambda[-1][cond2!=0]),na.rm=TRUE)
+    Integr2 <- sum(log(IntLambda[cond2!=0]),na.rm=TRUE)
+    #Integr2 <- (Integr2a+Integr2b)/2
+  }else{
+    yuima.stop("Spal")
+  }
   # if(is.nan(Integr2)){
   #   Integr2 <- -10^6
   # }
   logLik <- Integr1+Integr2
+  if(is.null(my.envd1$oldpar)){
+    oldpar <- param
+  }else{
+    oldpar <- my.envd1$oldpar
+  }
+  ret <- -logLik/sum(cond2,na.rm=TRUE)#+sum((param-oldpar)^2*param^2)/2
   cat("\n ",logLik, param)
-  return(-logLik)
+  
+  #assign("oldpar",param,envir = my.envd1)
+  
+  return(ret)
 }
 
 
@@ -86,9 +104,9 @@ quasiLogLik.Ppr <- function(yuimaPpr, parLambda=list(), method=method, fixed = l
 
     #CountingVariable
     for(i in c(1:length(yuimaPPr@Ppr@counting.var))){
-      cond <- yuimaPPr@Ppr@counting.var[i] %in% yuimaPPr@model@solve.variable
+      cond <- yuimaPPr@model@solve.variable %in% yuimaPPr@Ppr@counting.var[i]
       dummyData <-unique(yuimaPPr@data@original.data[,cond])[-1]
-      assign(yuimaPPr@Ppr@counting.var[i], dummyData,envir=my.envd1)
+      assign(yuimaPPr@Ppr@counting.var[i], rep(1,length(dummyData)),envir=my.envd1)
     }
     # Names expression
     assign("NamesIntgra", NamesIntegrandExpr, envir=my.envd1)
@@ -101,10 +119,10 @@ quasiLogLik.Ppr <- function(yuimaPpr, parLambda=list(), method=method, fixed = l
         namedX<-c(namedX,paste0("d",yuimaPPr@Kernel@variable.Integral@var.dx[i]))
         namedJumpTimeX <-c(namedJumpTimeX,paste0("JumpTime.d",yuimaPPr@Kernel@variable.Integral@var.dx[i]))
         dummyData <- diff(as.numeric(yuimaPPr@data@original.data[,cond]))# We consider only Jump
-        dummyJumpTime <- gridTime[-1][dummyData>0]
+        dummyJumpTime <- gridTime[-1][dummyData!=0]
         dummyData2 <- diff(unique(cumsum(dummyData)))
         #dummyData3 <- zoo(dummyData2,order.by = dummyJumpTime)
-        dummyData3 <- dummyData2
+        dummyData3 <- rep(1,length(dummyData2))
         JumpTime <- dummyJumpTime
         assign(paste0("d",yuimaPPr@Kernel@variable.Integral@var.dx[i]), dummyData3 ,envir=my.envd1)
         assign(paste0("JumpTime.d",yuimaPPr@Kernel@variable.Integral@var.dx[i]), dummyJumpTime ,envir=my.envd1)
@@ -116,9 +134,13 @@ quasiLogLik.Ppr <- function(yuimaPpr, parLambda=list(), method=method, fixed = l
     assign("t.time",yuimaPPr@Kernel@variable.Integral@upper.var,envir=my.envd1)
 
     # Covariates
-    if(length(yuimaPPr@Ppr@covariates)>1){
+    if(length(yuimaPPr@Ppr@covariates)>0){
       # Covariates should be identified at jump time
-      return(NULL)
+      for(i in c(1:length(yuimaPPr@Ppr@covariates))){
+        cond <- yuimaPPr@model@solve.variable %in% yuimaPPr@Ppr@covariates[i]
+        condTime <- gridTime %in% my.envd1$JumpTime.dN
+        assign(yuimaPPr@Ppr@covariates[i],yuimaPPr@data@original.data[condTime,cond],envir = my.envd1)
+      }
     }
 
   }
@@ -130,7 +152,7 @@ quasiLogLik.Ppr <- function(yuimaPpr, parLambda=list(), method=method, fixed = l
 
     #CountingVariable
     for(i in c(1:length(yuimaPPr@Ppr@counting.var))){
-      cond <- yuimaPPr@Ppr@counting.var[i] %in% yuimaPPr@model@solve.variable
+      cond <- yuimaPPr@model@solve.variable %in% yuimaPPr@Ppr@counting.var[i]
       dummyData <-yuimaPPr@data@original.data[,cond]
       assign(yuimaPPr@Ppr@counting.var[i], dummyData,envir=my.envd1)
     }
@@ -145,11 +167,18 @@ quasiLogLik.Ppr <- function(yuimaPpr, parLambda=list(), method=method, fixed = l
   # construction my.envd3
 
   #Covariate
-
+  dimCov<-length(yuimaPPr@Ppr@covariates)
+  if(dimCov>0){
+    for(i in c(1:dimCov)){
+      cond <- yuimaPPr@model@solve.variable %in% yuimaPPr@Ppr@covariates[i] 
+      dummyData <- yuimaPPr@data@original.data[,cond]
+      assign(yuimaPPr@Ppr@covariates[i], dummyData,envir=my.envd3)
+    }
+  }
   #CountingVariable
   for(i in c(1:length(yuimaPPr@Ppr@counting.var))){
-    cond <- yuimaPPr@Ppr@counting.var[i] %in% yuimaPPr@model@solve.variable
-    dummyData <-yuimaPPr@data@original.data[,cond]
+    cond <- yuimaPPr@model@solve.variable %in% yuimaPPr@Ppr@counting.var[i]
+    dummyData <-cumsum(c(as.numeric(yuimaPPr@data@original.data[1,cond]!=0),as.numeric(diff(yuimaPPr@data@original.data[,cond])!=0)))
     assign(yuimaPPr@Ppr@counting.var[i], dummyData,envir=my.envd3)
   }
   #time
