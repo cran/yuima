@@ -10,7 +10,7 @@ Realized Multipower Variation
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-The function returns the realized MultiPower Variation (mpv), defined in Barndorff-Nielsen and Shephard (2004), for each components.
+The function returns the realized MultiPower Variation (mpv), defined in Barndorff-Nielsen and Shephard (2004), for each component.
 }
 \usage{
 mpv(yuima, r = 2, normalize = TRUE)
@@ -71,10 +71,10 @@ Yuta Koike with YUIMA Project Team
 
 \seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
-\code{\link{setModel}},\code{\link{cce}}
+\code{\link{setData}}, \code{\link{cce}}, \code{\link{minrv}}, \code{\link{medrv}}
 }
 \examples{
-
+\dontrun{
 set.seed(123)
 
 # One-dimensional case
@@ -110,7 +110,7 @@ plot(yuima)
 mpv(yuima,list(c(1,1),1,rep(2/3,3))) # true varue is c(1/3,1/2,1/3)
 
 }
-
+}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ts}

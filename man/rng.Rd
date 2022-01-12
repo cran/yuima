@@ -118,7 +118,7 @@ In one-dimensional case, its Levy density \eqn{f(z)} is given by:
 
 \author{The YUIMA Project Team
 
-Contacts: Hiroki Masuda \email{hiroki@math.kyushu-u.ac.jp} and Yuma Uehara \email{y-uehara@math.kyushu-u.ac.jp}
+Contacts: Hiroki Masuda \email{hiroki@math.kyushu-u.ac.jp} and Yuma Uehara \email{y-uehara@ism.ac.jp}
 }
 \note{
   Some density-plot functions are still missing: as for the non-Gaussian stable densities, one can use, e.g., stabledist package.
@@ -131,55 +131,55 @@ Contacts: Hiroki Masuda \email{hiroki@math.kyushu-u.ac.jp} and Yuma Uehara \emai
 
 Chhikara, R. (1988). The Inverse Gaussian Distribution: Theory: Methodology, and Applications (Vol. 95). CRC Press.
 
-Hörmann, W., & Leydold, J. (2014). Generating generalized inverse Gaussian random variates. Statistics and Computing, 24(4), 547-557.
-\href{http://onlinelibrary.wiley.com/doi/10.1111/1467-9469.00045/abstract}{http://onlinelibrary.wiley.com/doi/10.1111/1467-9469.00045/abstract}
+H??rmann, W., & Leydold, J. (2014). Generating generalized inverse Gaussian random variates. Statistics and Computing, 24(4), 547-557.
+\doi{10.1111/1467-9469.00045}
 
-Jørgensen, B. (2012). Statistical properties of the generalized inverse Gaussian distribution (Vol. 9). Springer Science & Business Media.
-\href{http://www.springer.com/la/book/9780387906652}{http://www.springer.com/la/book/9780387906652}
+Jorgensen, B. (2012). Statistical properties of the generalized inverse Gaussian distribution (Vol. 9). Springer Science & Business Media.
+\href{https://www.springer.com/la/book/9780387906652}{https://www.springer.com/la/book/9780387906652}
 
 Michael, J. R., Schucany, W. R., & Haas, R. W. (1976). Generating random variates using transformations with multiple roots. The American Statistician, 30(2), 88-90.
-\href{https://www.jstor.org/stable/2683801}{https://www.jstor.org/stable/2683801}
+\doi{10.1080/00031305.1976.10479147}
 
 ## rGH, dGH, rNIG, dNIG, rvgamma, dvgamma
 
 Barndorff-Nielsen, O. (1977). Exponentially decreasing distributions for the logarithm of particle size. In Proceedings of the Royal Society of London A: Mathematical, Physical and Engineering Sciences (Vol. 353, No. 1674, pp. 401-419). The Royal Society.
-\href{http://rspa.royalsocietypublishing.org/content/353/1674/401}{http://rspa.royalsocietypublishing.org/content/353/1674/401}
+\doi{10.1098/rspa.1977.0041}
 
 Barndorff-Nielsen, O. E. (1997). Processes of normal inverse Gaussian type. Finance and stochastics, 2(1), 41-68.
-\href{http://link.springer.com/article/10.1007/s007800050032}{http://link.springer.com/article/10.1007/s007800050032}
+\doi{10.1007/s007800050032}
 
-Eberlein, E. (2001). Application of generalized hyperbolic \enc{Lévy}{Levy} motions to finance. In \enc{Lévy}{Levy} processes (pp. 319-336). \enc{Birkhäuser}{Birkhauser} Boston.
-\href{http://link.springer.com/chapter/10.1007/978-1-4612-0197-7_14}{http://link.springer.com/chapter/10.1007/978-1-4612-0197-7_14}
+Eberlein, E. (2001). Application of generalized hyperbolic \enc{L??vy}{Levy} motions to finance. In \enc{L??vy}{Levy} processes (pp. 319-336). \enc{Birkh??user}{Birkhauser} Boston.
+\doi{10.1007/978-1-4612-0197-7_14}
 
-Eberlein, E., & Hammerstein, E. A. V. (2004). Generalized hyperbolic and inverse Gaussian distributions: limiting cases and approximation of processes. In Seminar on stochastic analysis, random fields and applications IV (pp. 221-264). Birkhäuser Basel.
-\href{http://link.springer.com/chapter/10.1007/978-3-0348-7943-9_15}{http://link.springer.com/chapter/10.1007/978-3-0348-7943-9_15}
+Eberlein, E., & Hammerstein, E. A. V. (2004). Generalized hyperbolic and inverse Gaussian distributions: limiting cases and approximation of processes. In Seminar on stochastic analysis, random fields and applications IV (pp. 221-264). Birkh??user Basel.
+\doi{10.1007/978-1-4612-0197-7_14}
 
 Madan, D. B., Carr, P. P., & Chang, E. C. (1998). The variance gamma process and option pricing. European finance review, 2(1), 79-105.
-\href{http://rof.oxfordjournals.org/content/2/1/79.short}{http://rof.oxfordjournals.org/content/2/1/79.short}
+\doi{10.1111/1467-9469.00045}
 
 ## rbgamma, dbgamma
 
-\enc{Küchler}{Kuchler}, U., & Tappe, S. (2008). Bilateral Gamma distributions and processes in financial mathematics. Stochastic Processes and their Applications, 118(2), 261-283.
-\href{http://www.sciencedirect.com/science/article/pii/S0304414907000609}{http://www.sciencedirect.com/science/article/pii/S0304414907000609}
+\enc{K??chler}{Kuchler}, U., & Tappe, S. (2008). Bilateral Gamma distributions and processes in financial mathematics. Stochastic Processes and their Applications, 118(2), 261-283.
+\doi{10.1016/j.spa.2007.04.006}
 
-\enc{Küchler}{Kuchler}, U., & Tappe, S. (2008). On the shapes of bilateral Gamma densities. Statistics & Probability Letters, 78(15), 2478-2484.
-\href{http://www.sciencedirect.com/science/article/pii/S0167715208001521}{http://www.sciencedirect.com/science/article/pii/S0167715208001521}
+\enc{K??chler}{Kuchler}, U., & Tappe, S. (2008). On the shapes of bilateral Gamma densities. Statistics & Probability Letters, 78(15), 2478-2484.
+\doi{10.1016/j.spa.2007.04.006}
 
 ## rstable
 
 Chambers, John M., Colin L. Mallows, and B. W. Stuck.  (1976) A method for simulating stable random variables, Journal of the american statistical association, 71(354), 340-344.
-\href{http://amstat.tandfonline.com/doi/abs/10.1080/01621459.1976.10480344}{http://amstat.tandfonline.com/doi/abs/10.1080/01621459.1976.10480344}
+\doi{10.1080/01621459.1976.10480344}
 
-Weron, \enc{Rafał}{Rafal}. (1996) On the Chambers-Mallows-Stuck method for simulating skewed stable random variables, Statistics & probability letters, 28.2, 165-171.
-\href{http://www.sciencedirect.com/science/article/pii/0167715295001131}{http://www.sciencedirect.com/science/article/pii/0167715295001131}
+Weron, \enc{Rafa??}{Rafal}. (1996) On the Chambers-Mallows-Stuck method for simulating skewed stable random variables, Statistics & probability letters, 28.2, 165-171.
+\doi{10.1016/0167-7152(95)00113-1}
 
-Weron, \enc{Rafał}{Rafal}. (2010) Correction to:" On the Chambers-Mallows-Stuck Method for Simulating Skewed Stable Random Variables", No. 20761, University Library of Munich, Germany.
+Weron, \enc{Rafa??}{Rafal}. (2010) Correction to:" On the Chambers-Mallows-Stuck Method for Simulating Skewed Stable Random Variables", No. 20761, University Library of Munich, Germany.
 \href{https://ideas.repec.org/p/pra/mprapa/20761.html}{https://ideas.repec.org/p/pra/mprapa/20761.html}
 
 ## rpts
 
 Kawai, R., & Masuda, H. (2011). On simulation of tempered stable random variates. Journal of Computational and Applied Mathematics, 235(8), 2873-2887.
-\href{http://www.sciencedirect.com/science/article/pii/S0377042710006643}{http://www.sciencedirect.com/science/article/pii/S0377042710006643}
+\doi{10.1016/j.cam.2010.12.014}
 
 ## rnts
 
@@ -188,7 +188,7 @@ Barndorff-Nielsen, O. E., & Shephard, N. (2001). Normal modified stable processe
 }
 
 \examples{
-
+\dontrun{
 set.seed(123)
 
 # Ex 1. (One-dimensional standard Cauchy distribution)
@@ -259,7 +259,7 @@ Lambda<-matrix(c(1,0,0,1),2,2)
 x<-10 # the number of r.n
 rGH(x,lambda,alpha,beta,delta,mu,Lambda)
 }
-
+}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ts}

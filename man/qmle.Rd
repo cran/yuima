@@ -22,10 +22,10 @@
 %ml.ql(yuima,theta2,theta1,h,theta2.lim=matrix(c(0,1),1,2),theta1.lim=matrix(c(0,1),1,2),print=FALSE,method,param,interval)
 %ql(yuima,theta2,theta1,h,print=FALSE,param)
 %rql(yuima,theta2,theta1,ptheta2,ptheta1,h,print=FALSE,param,prevparam)
-qmle(yuima, start, method = "BFGS", fixed = list(), print =
-FALSE, lower, upper, joint = FALSE, Est.Incr =
-"NoIncr", aggregation = TRUE, threshold = NULL, rcpp =
-FALSE, ...)
+qmle(yuima, start, method = "L-BFGS-B", fixed = list(),
+print = FALSE, envir = globalenv(), lower, upper, joint = FALSE, Est.Incr ="NoIncr",
+aggregation = TRUE, threshold = NULL, rcpp =FALSE, ...)
+
 quasilogl(yuima, param, print = FALSE, rcpp = FALSE)
 lse(yuima, start, lower, upper, method = "BFGS", ...)
 }
@@ -37,6 +37,7 @@ lse(yuima, start, lower, upper, method = "BFGS", ...)
 %    parameters. Vector can be available only if theta is a scalar.}
 %  \item{ptheta2,ptheta1}{}
   \item{print}{you can see a progress of the estimation when print is TRUE.}
+  \item{envir}{an environment where the model coefficients are evaluated.}
   \item{method}{see Details.}
   \item{param}{\code{list} of parameters for the  quasi loglikelihood.}
 %  \item{interval}{}
@@ -91,11 +92,11 @@ Ogihara, T., & Yoshida, N. (2011). Quasi-likelihood analysis for the stochastic 
 
 ## COGARCH
 
-Iacus S. M., Mercuri L. and Rroji E.(2015) Discrete time approximation of a COGARCH (p, q) model and its estimation. \href{http://arxiv.org/abs/1511.00253}{http://arxiv.org/abs/1511.00253}
+Iacus S. M., Mercuri L. and Rroji E.(2015) Discrete time approximation of a COGARCH (p, q) model and its estimation. \href{https://arxiv.org/abs/1511.00253}{https://arxiv.org/abs/1511.00253}
 
 ## CARMA
 
-Iacus S. M., Mercuri L. (2015) Implementation of Levy CARMA model in Yuima package. Comp. Stat. (30) 1111-1141. \href{http://link.springer.com/article/10.1007/s00180-015-0569-7}{http://link.springer.com/article/10.1007/s00180-015-0569-7}
+Iacus S. M., Mercuri L. (2015) Implementation of Levy CARMA model in Yuima package. Comp. Stat. (30) 1111-1141. \href{https://link.springer.com/article/10.1007/s00180-015-0569-7}{https://link.springer.com/article/10.1007/s00180-015-0569-7}
 }
 
 \author{The YUIMA Project Team}
@@ -140,7 +141,7 @@ system.time(
 opt2 <- qmle(yuima, start=list(theta1=0.8, theta2=0.7), lower=list(theta1=0,theta2=0),
  upper=list(theta1=1,theta2=1), method="L-BFGS-B")
 )
-cat(sprintf("\nTrue param. theta2 = .3, theta1 = .1\n"))
+cat(sprintf("\nTrue param. theta1 = .3, theta2 = .1\n"))
 print(coef(opt2))
 
 ## initial guess for theta2 by least squares estimator
@@ -151,7 +152,7 @@ system.time(
 opt3 <- qmle(yuima, start=list(theta1=0.8, theta2=tmp), lower=list(theta1=0,theta2=0),
  upper=list(theta1=1,theta2=1), method="L-BFGS-B")
 )
-cat(sprintf("\nTrue param. theta2 = .3, theta1 = .1\n"))
+cat(sprintf("\nTrue param. theta1 = .3, theta2 = .1\n"))
 print(coef(opt3))
 
 
@@ -160,14 +161,22 @@ system.time(
 opt4 <- qmle(yuima, start=list(theta1=0.8, theta2=0.7), lower=list(theta1=0,theta2=0),
  upper=list(theta1=1,theta2=1), method="L-BFGS-B", joint=TRUE)
 )
-cat(sprintf("\nTrue param. theta2 = .3, theta1 = .1\n"))
+cat(sprintf("\nTrue param. theta1 = .3, theta2 = .1\n"))
 print(coef(opt4))
+
+## fix theta1 to the true value
+system.time(
+opt5 <- qmle(yuima, start=list(theta2=0.7), lower=list(theta2=0),
+upper=list(theta2=1),fixed=list(theta1=0.3), method="L-BFGS-B")
+)
+cat(sprintf("\nTrue param. theta1 = .3, theta2 = .1\n"))
+print(coef(opt5))
 
 ## old code
 ##system.time(
 ##opt <- ml.ql(yuima, 0.8, 0.7, h=1/((n)^(2/3)), c(0, 1), c(0, 1), method="Newton")
 ##)
-##cat(sprintf("\nTrue param. theta2 = .3, theta1 = .1\n"))
+##cat(sprintf("\nTrue param. theta1 = .3, theta2 = .1\n"))
 ##print(coef(opt))
 
 

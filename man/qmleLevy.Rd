@@ -1,6 +1,8 @@
 \encoding{UTF-8}
 \name{qmleLevy}
 \alias{qmleLevy}
+\alias{Estimation.LevyIncr}
+\alias{LevySDE}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Gaussian quasi-likelihood estimation for Levy driven SDE
@@ -9,16 +11,20 @@ Gaussian quasi-likelihood estimation for Levy driven SDE
 Calculate the Gaussian quasi-likelihood and Gaussian quasi-likelihood estimators of Levy driven SDE.
 }
 \usage{
-qmleLevy(yuima, start, lower, upper, joint = FALSE, third = FALSE)
+qmleLevy(yuima, start, lower, upper, joint = FALSE, 
+third = FALSE, Est.Incr = "NoIncr", 
+aggregation = TRUE)
 }
 \arguments{
   \item{yuima}{a yuima object.}
   \item{lower}{a named list for specifying lower bounds of parameters.}
   \item{upper}{a named list for specifying upper bounds of parameters.}
   \item{start}{initial values to be passed to the optimizer.}
-  \item{joint}{perform joint estimation or two stage estimation? by default joint=FALSE. If there exists an overlapping parameter, joint=TRUE does not work for the theoretical reason}
-  \item{third}{perform third estimation? by default third=FALSE. If there exists an overlapping parameter, third=TRUE does not work for the         
+  \item{joint}{perform joint estimation or two stage estimation, by default \code{joint=FALSE}. If there exists an overlapping parameter, \code{joint=TRUE} does not work for the theoretical reason}
+  \item{third}{perform third estimation by default \code{third=FALSE}. If there exists an overlapping parameter, \code{third=TRUE} does not work for the         
                theoretical reason.}
+  \item{Est.Incr}{the qmleLevy returns an object of \code{mle-clas}, by default \code{Est.Incr="NoIncr"}, other options as \code{"Inc"} or \code{"IncrPar"}.}         
+  \item{aggregation}{If \code{aggregation=TRUE}, the function returns the unit-time Levy increments. If \code{Est.Incr="IncrPar"}, the function estimates Levy parameters using the unit-time Levy increments.}    
 }
 \details{
 This function performs Gaussian quasi-likelihood estimation for Levy driven SDE.
@@ -56,7 +62,7 @@ stochastic differential equation (Japanese) ., Proc. Inst. Statist. Math., accep
 \author{
 The YUIMA Project Team
 
-Contacts: Yuma Uehara \email{y-uehara@math.kyushu-u.ac.jp}
+Contacts: Yuma Uehara \email{y-uehara@ism.ac.jp}
 }
 
 
@@ -64,6 +70,7 @@ Contacts: Yuma Uehara \email{y-uehara@math.kyushu-u.ac.jp}
 %\seealso{
 %}
 \examples{
+\dontrun{
 ## One-dimensional case 
 dri<-"-theta0*x" ## set drift
 jum<-"theta1/(1+x^2)^(-1/2)" ## set jump
@@ -124,6 +131,7 @@ start<-list(theta0 = runif(1,0.5,4), theta1 = runif(1,1,4),
 theta2 = runif(1,1,5),lambda=lambda, alpha=alpha, 
 beta=beta,mu=mu, Lambda=Lambda) ## set initial values
 qmleLevy(yuima,start=start,lower=lower,upper=upper,joint = FALSE,third=TRUE) 
+}
 }
 
 \keyword{qmle}% use one of  RShowDoc("KEYWORDS")

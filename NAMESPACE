@@ -9,6 +9,7 @@ import("expm")
 import("mvtnorm")
 import("cubature")
 
+import("coda")
 importFrom(utils, toLatex)
 
 importFrom("graphics", "lines")
@@ -63,6 +64,19 @@ importFrom(utils, str)
 importFrom(stats, sd)
 importFrom("stats", cov2cor) # added by YK on Apr. 12, 2018
 importFrom("graphics", "abline", "hist", "par", "text") # added by YK on Jul. 19, 2019
+importFrom("stats", "mvfft") # added by YK on Apr. 15, 2020
+importFrom(coda, as.mcmc)
+importFrom("stats", "cov", "var")
+
+# added by EG on Dec. 15, 2021
+importFrom(calculus,"%dot%")
+importFrom(calculus,"%gradient%")
+importFrom(calculus,"%inner%")
+importFrom(calculus,"%mx%")
+importFrom(calculus,"%outer%")
+importFrom(calculus,"%prod%")
+importFrom(calculus,"%sum%")
+
 
 exportClasses("yuima",
 "yuima.data",
@@ -92,7 +106,8 @@ exportClasses("yuima",
 "yuima.PPR",
 "yuima.Hawkes",
 "yuima.PPR.qmle",
-"yuima.snr"
+"yuima.snr",
+"yuima.ae"  # added by EG on Dec. 15, 2021
 )
 
 exportMethods(
@@ -172,6 +187,10 @@ export(lmm) # Oct. 10, 2015: local methods of moment estimator
 export(mllag) # Oct. 10, 2015: multiple lead-lag detector
 export(llag.test) # Sep. 9, 2017: testing the absence of lead-lag effects 
 export(cce.factor) # Jul. 19, 2019: high-dimensional covariance estimator
+export(simBmllag) # added by YK on Apr. 15, 2020
+export(simBmllag.coef) # added by YK on Apr. 15, 2020
+export(wllag) # added by YK on Apr. 15, 2020
+export(minrv, medrv, minrv.test, medrv.test, lm.jumptest, pz.test) # added by YK on Nov. 28, 2021
 
 export(get.zoo.data)
 
@@ -223,6 +242,18 @@ export(cogarchNoise)
 export(Diagnostic.Cogarch)
 export(Diagnostic.Carma)
 
+# Asymptotic expansion (added by EG on Dec. 15, 2021)
+export(ae)
+export(aeCharacteristic)
+export(aeDensity)
+export(aeExpectation)
+export(aeKurtosis)
+export(aeMarginal)
+export(aeMean)
+export(aeMoment)
+export(aeSd)
+export(aeSkewness)
+
 # Methods
 export(rand)# random number generator of a Levy process specified by user
 export(dens)
@@ -243,7 +274,8 @@ S3method(print, yuima.lasso)
 S3method(print, yuima.llag) # Oct. 10, 2015
 S3method(print, yuima.mllag) # Oct. 10, 2015
 S3method(print, yuima.specv) # Oct. 10, 2015
-
+S3method(print, yuima.ic)
+S3method(print, yuima.wllag) # added by YK on Apr. 15, 2020
 
 S3method(toLatex, yuima)
 S3method(toLatex, yuima.model)
@@ -254,5 +286,7 @@ S3method(cbind, yuima)
 
 S3method(plot, yuima.llag) # Oct. 10, 2015
 S3method(plot, yuima.mllag) # Oct. 10, 2015
+S3method(plot, yuima.wllag) # added by YK on Apr. 15, 2020
+
 useDynLib(yuima)
 

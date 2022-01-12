@@ -146,7 +146,7 @@ constHazIntPr <- function(g.Fun , Kern.Fun, covariates, counting.var,statevar=NU
       dum.Ker <- gsub(my.countOld, my.countNew, x = dum.Ker, fixed=TRUE)
         
       my.countOld <- paste0(covariates[i] ,"[",Kern.Fun@variable.Integral@upper.var,"]")
-      my.countNew <- paste0("tail(", covariates[i] , " n=1L ) ")
+      my.countNew <- paste0("tail(", covariates[i] , ", n=1L ) ")
       dum.Ker <- gsub(my.countOld, my.countNew, x = dum.Ker, fixed=TRUE)
         
       my.countOld <- paste0(covariates[i] ,"[",Kern.Fun@variable.Integral@var.time,"]")
@@ -1286,7 +1286,7 @@ aux.simulatPPRROldNew<-function(object, nsim = nsim, seed = seed,
           dimCov <- length(object@PPR@covariates)
           
           if (dimCov>0){
-            for(j in c(1:dimCov)){
+            for(jj in c(1:dimCov)){
               # my.covdata <- simMod@data@original.data[1:i,object@PPR@covariates[j]]
               # names(my.covdata) <-simMod@sampling@grid[[1]][1:i]
               # 
@@ -1294,8 +1294,8 @@ aux.simulatPPRROldNew<-function(object, nsim = nsim, seed = seed,
               #        my.covdata,
               #        envir = my.env)
               
-              assign(object@PPR@covariates[j],
-                     as.numeric(simMod@data@original.data[1:inter_i[j],object@PPR@covariates[j]]),
+              assign(object@PPR@covariates[jj],
+                     as.numeric(simMod@data@original.data[1:inter_i[j],object@PPR@covariates[jj]]),
                      envir = my.env)
             }
           }  
