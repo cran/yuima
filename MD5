@@ -1,7 +1,7 @@
 94d55d512a9ba36caa9b7df079bae19f *COPYING
-15c2028568528c2e4390a390fc6013b4 *DESCRIPTION
-1976c100cd4dedaaf26e90e609235545 *NAMESPACE
-050fc01ddf4030dbcdafabb7f86cd760 *NEWS
+3bf57fa4c251682f9e0272e77a34dbab *DESCRIPTION
+e14bf414f7bf1023bc0fec2d9e443654 *NAMESPACE
+6c3baa4587c5855c80559757255c78ac *NEWS
 5142e55d1bab0b3d632328024ea4581b *R/AllClasses.R
 a57282007ddeb97e5a975ab60fe1d12b *R/AuxMethodforPPR.R
 4b22fa1f5201199bc7d2afc39b2f41e7 *R/CPoint.R
@@ -72,7 +72,7 @@ d0600e3fdc00d5a0c297316425f6c814 *R/simulateMultiProcess.R
 76ef13ea18f2507ece6c661cf3d1b805 *R/spectralcov.R
 f506cf2d30a5f912b5221112d7ae8965 *R/subsampling.R
 3009a7d539f3dbbef7b828129687062c *R/toLatex.R
-1db85d2f66897c8375a9539707f5b4e7 *R/wllag.r
+76530303d473d1152148193fc5a52c4e *R/wllag.R
 1ee5ca21b65c9c4bde9656529686669d *R/yuima.R
 edfabacecae0ebb9b40324f1d499b4b9 *R/yuima.characteristic.R
 6a4223ef8dae8e3b128da32d29e61b20 *R/yuima.data.R
@@ -81,7 +81,7 @@ edfabacecae0ebb9b40324f1d499b4b9 *R/yuima.characteristic.R
 28a257804b7d08a3fb47100a5c536234 *R/yuima.model.R
 e3c164669a627b3f16fc6da48e714da5 *R/yuima.sampling.R
 48a7ba9f63b106e188f6c3dc19d836eb *R/zzz.R
-0302a4260d695fbfc6b4440a8191acb3 *build/partial.rdb
+6d72f8f507ebad8777406d19040f9ec4 *build/partial.rdb
 b516711f126a8aafd4aae9b758da7824 *data/LogSPX.rda
 bce7107dc324a66a94865b56f9e3bbf3 *data/MWK151.rda
 ba391af8d40ef453c6d0a726d4170ffa *inst/AUTHORS
@@ -177,7 +177,7 @@ ab5b290fd33ce465c9c035d49995ce77 *man/simFunctional.Rd
 114989e6fbd3d202b0f3a6650a019abb *man/subsampling.Rd
 6536952261748e9437d0f7fb8b4ee476 *man/toLatex.Rd
 c8383c3a57f9c6f87e8d321e4db0e92e *man/variable.Integral.rd
-714b6309e166da646bfae28372358fff *man/wllag.Rd
+84e4060d13d434ffa5cab09ba38d444a *man/wllag.Rd
 d98511434eb2f68e90622e9d1bb6b8de *man/ybook.Rd
 fef5e35bf94cc6944496627e9f04a084 *man/yuima-class.Rd
 ab1e99f44258125e416cee06598f2ca3 *man/yuima.CP.qmle-class.Rd
