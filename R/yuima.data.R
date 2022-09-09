@@ -35,9 +35,11 @@ onezoo <- function(ydata) {
   }
 
   if(!is.null(dim(dats))){
-    if(class(ydata)=="yuima")
+    #if(class(ydata)=="yuima")
+    if(inherits(ydata, "yuima")) # YK, Mar. 22, 2022
      colnames(dats) <- colnames(ydata@data@original.data)
-    if(class(ydata)=="yuima.data")
+    #if(class(ydata)=="yuima.data")
+    if(inherits(ydata, "yuima.data")) # YK, Mar. 22, 2022
       colnames(dats) <- colnames(ydata@original.data)
 
 
@@ -170,7 +172,8 @@ setMethod("cbind.yuima", signature(x="yuima"),
             yd.tmp <- y.list[[1]]@data
             for(idx in 2:y.num){
               ##:: error check
-              if( class(y.list[[idx]])!="yuima"){
+              ##if( class(y.list[[idx]])!="yuima"){
+              if( !inherits(y.list[[idx]],"yuima")){
                 stop("arg ", idx, " is not yuima-class")
               }
               ##:: bind
@@ -195,7 +198,8 @@ setMethod("cbind.yuima", signature(x="yuima.data"),
             od.tmp <- yd.list[[1]]@original.data
             for(idx in 2:yd.num){
               ##:: error check
-              if( class(yd.list[[idx]])!="yuima.data" ){
+              ##if( class(yd.list[[idx]])!="yuima.data" ){
+              if( !inherits(yd.list[[idx]],"yuima.data") ){
                 stop("arg ", idx, " is not yuima.data-class.")
               }
               ##:: bind

@@ -36,10 +36,15 @@ yuima.Simplify <- function(expr, yuima.env){
         } else if (is.language(expr) && is.symbol(expr[[1]])) {
             # is there a rule in the table?
             sym.name <- as.character(expr[[1]])
-            if (class(try(Simplify.rule <-
+#            if (class(try(Simplify.rule <-
+#            get(sym.name, envir=yuima.env,
+#            inherits=FALSE), silent=TRUE))
+#            != "try-error")
+            tmpOutTry <- try(Simplify.rule <-
             get(sym.name, envir=yuima.env,
-            inherits=FALSE), silent=TRUE))
-            != "try-error")
+            inherits=FALSE), silent=TRUE)
+            
+            if(!inherits(tmpOutTry,"try-error"))
             return(Simplify.rule(expr))
         }
         expr
@@ -346,9 +351,11 @@ function(object){
       is.fracdiff <- FALSE
      }
     }
-    if( class(mod) == "yuima.carma")
+    #if( class(mod) == "yuima.carma")
+    if( inherits(mod, "yuima.carma")) # YK, Mar. 22, 2022
      is.carma <- TRUE
-    if( class(mod) == "yuima.cogarch"){
+    #if( class(mod) == "yuima.cogarch"){
+    if( inherits(mod, "yuima.cogarch")){ # YK, Mar. 22, 2022
       is.cogarch <- TRUE
       is.wienerdiff <- FALSE
       is.fracdiff <- FALSE
