@@ -1,7 +1,7 @@
 94d55d512a9ba36caa9b7df079bae19f *COPYING
-2764bbca8aa026dfca6251531ff2e1f3 *DESCRIPTION
+4433fd2e25bb7ee800dc95e29b3c3aa7 *DESCRIPTION
 b26138abcdf0aa02787ed18c554ece0a *NAMESPACE
-beb84c2968272caa009bb944d5457746 *NEWS
+9e7a16ccb8b471ca45709ed0fcc23132 *NEWS
 5142e55d1bab0b3d632328024ea4581b *R/AllClasses.R
 a57282007ddeb97e5a975ab60fe1d12b *R/AuxMethodforPPR.R
 4b22fa1f5201199bc7d2afc39b2f41e7 *R/CPoint.R
@@ -12,7 +12,7 @@ a57282007ddeb97e5a975ab60fe1d12b *R/AuxMethodforPPR.R
 6176779119bb0e1a7260ead2443e9dff *R/DiagnosticCarma.R
 dfe64a7e6dfa0aaabcc0b00eb7a70ffa *R/DiagnosticCogarch.R
 a2f3320e8867e19de53e13f5be0f08d8 *R/FunctionAndOperators.R
-b369c60777c1369654b330b3f7541c7a *R/IC.R
+fc7c84bf436ca050ca35d9203649cc47 *R/IC.R
 9d2c7055d6a63958f9970dfc9ba95ca3 *R/JBtest.R
 9f604491f19766f60c180f2dacb746b6 *R/MM.COGARCH.R
 6572d692fccc1407df5b668b5bf583a8 *R/MethodForLaw.R
@@ -83,7 +83,7 @@ edfabacecae0ebb9b40324f1d499b4b9 *R/yuima.characteristic.R
 28a257804b7d08a3fb47100a5c536234 *R/yuima.model.R
 e3c164669a627b3f16fc6da48e714da5 *R/yuima.sampling.R
 48a7ba9f63b106e188f6c3dc19d836eb *R/zzz.R
-0c6ad5b3446721162c89589e8077ab1c *build/partial.rdb
+ea124a494ad7922985532ad3b308e4d5 *build/partial.rdb
 b516711f126a8aafd4aae9b758da7824 *data/LogSPX.rda
 bce7107dc324a66a94865b56f9e3bbf3 *data/MWK151.rda
 ba391af8d40ef453c6d0a726d4170ffa *inst/AUTHORS
@@ -101,7 +101,7 @@ c8b3f38a9fad84d0192b46dcf0349cb2 *man/CarmaNoise.Rd
 56693c1f961ee6604d9ed93faaabe9af *man/DataPpr.Rd
 fcaec333dd3bfa09a0d54c99c18136cc *man/Diagnostic.Carma.Rd
 29b9804c096fe638602e560755937edc *man/Diagnostic.Cogarch.Rd
-31d1555e71833bd998ee585fd080c2f0 *man/IC.Rd
+27ae809ab88834490b6996180b8f212e *man/IC.Rd
 c9fa5098456dc1130f2ab49cc52998f8 *man/Integral.sde.rd
 fed0fe6ff46a9774ccba4ab71d8ef105 *man/Integrand.rd
 1e54f921c3aabc77ed7969da0bd381ff *man/Intensity.PPR.Rd
@@ -157,7 +157,7 @@ c4f391018f0d723df2b56a465e19ce4b *man/pz.test.Rd
 a490f0dbc44e8362d1c5796121a40e29 *man/qmle.Rd
 84eb19b6fc41e70ecd7e38d0b3cfd40b *man/qmleLevy.Rd
 a1939e095c6e02f439ab24c13baef980 *man/rconst.Rd
-15554605c3780c0180eee4dd01eab302 *man/rng.Rd
+d55f2a789a0c2cbe7632cb05ba3ffd7a *man/rng.Rd
 a7b9672a9a8abd48d70d1300860fe56a *man/setCarma.Rd
 03d9b0bc8e1ed51d3e28682cd9fb1f27 *man/setCharacteristic.Rd
 0444a68de366b5ad4fa277c23a30160f *man/setCogarch.Rd
@@ -211,10 +211,10 @@ ed850664d5c53526f04a0f1549e47222 *src/IntensityEval.cpp
 2b1a38d3f511eca643f8bb068606f767 *src/Mt.h
 d526b452d20f043cf4f3e85be8345a32 *src/PseudoLoglikCOGARCH.c
 b4d2d444be716ac9cec996a6fc4aedb6 *src/RcppExports.cpp
-8579a8f007701308548399e32785ead2 *src/ae.cpp
+90810c6284ca822518ffa5c156e820a2 *src/ae.cpp
 9bf5144dbaa6f7c01b99307463cdee07 *src/carmafilter.c
 d137c20dcd50d915d3983d84fa68717c *src/cce_functions.c
-76f782fb881a2f755f582c80eab6ad48 *src/euler.c
+75c16403ce883bbb7c23269e0bb1767a *src/euler.c
 4c06820c7b26b2f4dae030676c8343f1 *src/minusquasilogl_W1andW2.cpp
 6fff84b58d702d6e4f6904005733ab4d *src/pseudoLogLikCogarchIrregularGrid.cpp
 e6bb05e4b4e54b75f046f52469949dd0 *src/qmlecpp.cpp
