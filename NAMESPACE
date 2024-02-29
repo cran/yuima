@@ -4,10 +4,12 @@ import("methods")
 importFrom("graphics", "plot")
 import("zoo")
 importFrom(stats, confint)
+importFrom("stats", "uniroot")
 import("stats4")
 import("expm")
 import("mvtnorm")
 import("cubature")
+importFrom("statmod","gauss.quad")
 
 import("coda")
 importFrom(utils, toLatex)
@@ -15,6 +17,7 @@ importFrom(utils, toLatex)
 importFrom("graphics", "lines")
 importFrom("stats", "qchisq")
 importFrom("utils", "relist")
+importFrom("stats", "spline")
 
 importFrom(boot, boot) # added by YK on Sep. 9, 2017 
 #08/07/2016
@@ -87,6 +90,8 @@ exportClasses("yuima",
 "yuima.model",
 "model.parameter",
 "yuima.carma",
+"yuima.carmaHawkes",
+"carmaHawkes.info",
 "carma.info",
 "yuima.carma.qmle",
 "yuima.poisson",
@@ -106,7 +111,9 @@ exportClasses("yuima",
 "info.PPR",
 "yuima.PPR",
 "yuima.Hawkes",
+"yuima.th",
 "yuima.PPR.qmle",
+"yuima.LevyRM",
 "yuima.snr",
 "yuima.ae"  # added by EG on Dec. 15, 2021
 )
@@ -157,6 +164,7 @@ export(setData)
 export(setSampling)
 export(setCharacteristic)
 export(setCarma)
+export(setCarmaHawkes)
 export(setPoisson)
 export(setPPR)
 export(setHawkes)
@@ -167,7 +175,8 @@ export(setCogarch)
 export(setMap)
 #export(setMultiModel)
 export(setIntegral)
-
+export(FromCF2yuima_law)
+export(setLaw_th)
 export(dim)
 export(length)
 #export(start)
@@ -176,6 +185,8 @@ export(plot)
 #export(end)
 
 export(simulate) # simulates couple of processes
+export(setLRM)
+export(estimation_LRM)
 export(subsampling)
 export(cce)
 export(llag)
@@ -220,6 +231,7 @@ export(asymptotic_term)
 export(lse)
 
 export(qmle)
+export(EstimCarmaHawkes)
 export(get.counting.data)
 export(quasilogl)
 export(phi.test)

@@ -124,13 +124,21 @@ v. 1.15.15 2022/09/08
 2022/11/29
 * fixed IC.R and IC.Rd
 
-v. 1.15.18 2022/11/05
+2022/11/05 v. 1.15.18 
 * removed sprintf from ae.cpp
 * protected object in euler.c
 * changed if(class()) with inherits() in IC.R
 
-v. 1.15.20 2022/12/19
+2022/12/19 v. 1.15.20 
 * fixed  -Wuninitialized in ae.cpp
 
-v. 1.15.22 2022/12/20
+2022/12/20 v. 1.15.22 
 * fixed wrong URL on README.md
+
+2024/02/29 v. 1.15.27
+* fixed missing argument description in IC.Rd
+* fixed broken link in url in .RD file
+* fixed CITATION 
+* added \dontrun to a few examples
+
+

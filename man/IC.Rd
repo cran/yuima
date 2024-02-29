@@ -56,9 +56,7 @@ IC(drif = NULL, diff = NULL, jump.coeff = NULL, data = NULL, Terminal = 1,
   \item{rcpp}{
   use C++ code? (default \code{rcpp=FALSE})
   }
-  \item{\dots}{
-  
-  }
+  \item{\dots}{passed to \code{qmle}}
 }
 
 \details{

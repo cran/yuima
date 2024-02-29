@@ -8,7 +8,7 @@ Internal.LogLikPPR <- function(param,my.envd1=NULL,
                                auxModel = NULL,
                                auxPar = NULL){
   param<-unlist(param)
-  if(my.envd3$CondIntensityInKern){
+  if(any(my.envd3$CondIntensityInKern)){
     IntLambda<- InternalConstractionIntensityFeedBackIntegrand(param,my.envd1,
                                                    my.envd2,my.envd3)
   }else{
@@ -682,6 +682,7 @@ quasiLogLik.PPR <- function(yuimaPPR, parLambda=list(), method=method, fixed = l
                         #solve.variable = yuimaPPR@model@solve.variable,
                         state.variable = yuimaPPR@model@state.variable)
       myYuima <- setYuima(data = NewData, model = myMod)
+      myYuima@sampling <- yuimaPPR@sampling
       resCov <- qmleLevy(yuima = myYuima,
                       start=param[myMod@parameter@all],upper=upper[myMod@parameter@all],
                       lower=lower[myMod@parameter@all])

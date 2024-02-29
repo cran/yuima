@@ -92,7 +92,7 @@ There are typos in the first and second displayed equations in page 1221 of Haya
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 \code{\link{wllag}}
 }
-\examples{
+\examples{\dontrun{
 ## Example 1 
 ## Simulation setting of Hayashi and Koike (2018a, Section 4).
 
@@ -169,7 +169,7 @@ result <- simulate(yuima, increment.W = dW,
                    true.parameter = list(kappa = 5, eta = 0.04, xi = 0.5))
 
 plot(result)
-}
+}}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ts}% use one of  RShowDoc("KEYWORDS")

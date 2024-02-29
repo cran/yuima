@@ -112,7 +112,7 @@ The objective functions themselves do NOT consitently estimate the corresponding
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 \code{\link{simBmllag}}, \code{\link{llag}}
 }
-\examples{
+\examples{\dontrun{
 ## An example from a simulation setting of Hayashi and Koike (2018b)
 set.seed(123)
 
@@ -148,6 +148,7 @@ dev.off()
 op <- par(mfrow = c(4,2))
 plot(out)
 par(op)
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
